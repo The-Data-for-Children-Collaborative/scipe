@@ -102,16 +102,15 @@ def label_folds(dfs):
     return df_combined
 
 # Return dataframe with outliers defined in csv file removed
-def remove_outliers(df,outliers,strong_only=False):
+def remove_outliers(df,outliers,strong=True,weak=True):
     with open(outliers) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         next(csv_reader) # skip header
         for row in csv_reader:
             reject = int(row[5])
             if reject > 0:
-                if strong_only and reject == 1:
-                    continue
-                x,y = int(row[0]), int(row[1])
-                df = df[(df['x'] != x) | (df['y'] != y)]
+                if (reject == 1 and weak) or (reject==2 and strong):
+                    x,y = int(row[0]), int(row[1])
+                    df = df[(df['x'] != x) | (df['y'] != y)]
     return df
                 
