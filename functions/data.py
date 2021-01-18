@@ -4,9 +4,10 @@ import csv
 from tifffile import imread
 from copy import deepcopy
 from osgeo import gdal
+from functions.preprocessing import process_district
 
-raster_path = './100m/'
-survey_path = './Survey/'
+raster_path = './data/100m/'
+survey_path = './data/pop/'
 
 def write_raster(arr,file_match,file_out): # writes arr to raster file_out with geospatial coordinates of file_match
     # load match dataset
@@ -21,14 +22,15 @@ def write_raster(arr,file_match,file_out): # writes arr to raster file_out with 
     ds_out.GetRasterBand(1).SetNoDataValue(0)
     ds_out.FlushCache() # save to disk
 
-def get_feature_names():
+def get_feature_names(model_names):
     feature_names = [f'landsat_b{i}' for i in range(10)]
-    feature_names += ['ndvi', 'ndwi','ntl','hrsl','road_dist_m','building_area_diss','building_area_spacenet','building_area_spacesur',
+    feature_names += ['ndvi', 'ndwi','ntl','hrsl','road_dist_m',
              'no_class','closed_forest','open_forest','shrubs','hb_veg',
              'hb_waste','moss','bare','cropland','urban','snow','water','sea']
+    feature_names += [f'building_area_{name}' for name in model_names]
     return feature_names
 
-def load_rasters(roi): # load master list of all feature rasters
+def load_rasters(roi,model_names): # run preprocessing then load master list of all feature rasters
     rasters = []
     rasters.append(imread(f'{raster_path}{roi}_landsat_100m.tif').astype('float32'))
     rasters.append(imread(f'{raster_path}{roi}_ndvi_100m.tif').astype('float32'))
@@ -36,10 +38,9 @@ def load_rasters(roi): # load master list of all feature rasters
     rasters.append(imread(f'{raster_path}{roi}_ntl_100m.tif').astype('float32'))
     rasters.append(imread(f'{raster_path}{roi}_hrsl_100m.tif').astype('uint8'))
     rasters.append(imread(f'{raster_path}{roi}_roads_dist_100m.tif').astype('float32'))
-    rasters.append(imread(f'{raster_path}{roi}_building_area_100m.tif').astype('float32'))
-    rasters.append(imread(f'{raster_path}{roi}_building_area_spacenet_100m.tif').astype('float32'))
-    rasters.append(imread(f'{raster_path}{roi}_building_area_spacesur_100m.tif').astype('float32'))
     rasters.append(imread(f'{raster_path}{roi}_landcover_100m.tif').astype('uint8'))
+    for name in model_names:
+        rasters.append(imread(f'{raster_path}{roi}_building_area_{name}_100m.tif').astype('float32'))
     return rasters
 
 def get_context(raster,y,x): # return mean of 3x3 context area surrounding point (x,y) of raster

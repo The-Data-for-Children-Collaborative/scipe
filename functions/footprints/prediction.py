@@ -14,6 +14,12 @@ def load_model(model_path,weights_path):
         model = tf.keras.models.model_from_json(model_json)
         model.load_weights(weights_path)
         return model
+
+def load_models(model_paths):
+    models = []
+    for path in model_paths:
+        models.append(load_model(path+'model.json',path+'model.h5'))
+    return models
     
 def learn_distribution(path,count):
     ls = np.array(os.listdir(path))
@@ -33,16 +39,18 @@ def learn_distribution(path,count):
 def predict_sample(img,mean,std,model):
     img = img/255
     original_size = img.shape[0:2]
-    img = smart_resize(img,model.input_shape[1:3]) # resize to match model input size
+    img = tf.image.resize(img,model.input_shape[1:3]) # resize to match model input size
     img -= mean
     img /= std
     img = np.array([img])
     out = model.predict(img)[0]
-    out = smart_resize(out,original_size) # resize back to original size
+    out = tf.image.resize(out,original_size) # resize back to original size
     return out
 
-def estimate_footprints(survey,imgs,dst,model,n_samples=1000,threshold=0.75):
+def estimate_footprints(roi,survey,imgs,model_paths,thresholds,n_samples=1000):
     mean, std = learn_distribution(imgs,n_samples)
+    print(mean,std)
+    models = load_models(model_paths)
     print(f'Predicting building footprints for survey tiles in {imgs}',flush=True)
     with tqdm(total=np.sum(np.where(survey>0,1,0))) as pbar:
         for y in range(survey.shape[0]):
@@ -50,7 +58,9 @@ def estimate_footprints(survey,imgs,dst,model,n_samples=1000,threshold=0.75):
                 if survey[y,x] > 0:
                     img_path = f'{imgs}{y}_{x}.tif'
                     img = imread(img_path)
-                    out = predict_sample(img,mean,std,model)
-                    out = np.where(out >= threshold, 1, 0).astype('uint8') # apply threshold
-                    write_raster(out,img_path,f'{dst}{y}_{x}.tif')
+                    for i,model in enumerate(models):
+                        dst = f'{model_paths[i]}pred/{roi}/{y}_{x}.tif'
+                        out = predict_sample(img,mean,std,model)
+                        out = np.where(out >= thresholds[i], 1, 0).astype('uint8') # apply threshold
+                        write_raster(out,img_path,dst)
                     pbar.update(1)

@@ -42,7 +42,7 @@ def proximity_raster(src_filename,dst_filename):
     del dst # flush to save to disk
     
 def building_area(roi,building_path,cat='spacesur'):
-    shape = imread(f'./Survey/{roi}_survey.tif').shape
+    shape = imread(f'./data/pop/{roi}_pop.tif').shape
     area_raster = np.zeros(shape)
     buildings_dir = f'{building_path}{roi}/'
     for file in os.listdir(buildings_dir):
@@ -52,7 +52,7 @@ def building_area(roi,building_path,cat='spacesur'):
             y,x = int(y),int(x)
             building_area = np.sum(buildings) * 0.25 # each pixel occupies 0.25 m^2
             area_raster[y,x] = building_area
-    imsave(f'./100m/{roi}_building_area_{cat}_100m.tif',area_raster)
+    imsave(f'./data/100m/{roi}_building_area_{cat}_100m.tif',area_raster)
     
 def conv_class(raster): # lookup table for land cover classification simplification
     d = {}
@@ -99,26 +99,30 @@ def ndwi_landsat(file_in,file_out):
     ndwi = (nir - swir) / (nir + swir)
     imsave(file_out,ndwi)
 
-def process_district(roi):
-    match_filename=f'./Survey/{roi}_survey.tif'
+def process_district(roi,model_paths,model_names):
+    match_filename=f'./data/pop/{roi}_pop.tif'
 
-    src_filename=f'./LandSat/{roi}_landsat_2019.tif'
-    dst_filename=f'./100m/{roi}_landsat_100m.tif'
-    project_raster(src_filename,match_filename,dst_filename,gdalconst.GRA_Bilinear,10)
+    src_filename=f'./data/landsat/{roi}_landsat_2019.tif'
+    dst_filename=f'./data/100m/{roi}_landsat_100m.tif'
+    project_raster(src_filename,match_filename,dst_filename,gdalconst.GRA_Average,10)
     
-    ndvi_landsat(dst_filename,f'./100m/{roi}_ndvi_100m.tif')
-    ndwi_landsat(dst_filename,f'./100m/{roi}_ndwi_100m.tif')
+    ndvi_landsat(dst_filename,f'./data/100m/{roi}_ndvi_100m.tif')
+    ndwi_landsat(dst_filename,f'./data/100m/{roi}_ndwi_100m.tif')
 
-    src_filename=f'./NTL/{roi}_ntl_20190401.tif'
-    dst_filename=f'./100m/{roi}_ntl_100m.tif'
+    src_filename=f'./data/ntl/{roi}_ntl_20190401.tif'
+    dst_filename=f'./data/100m/{roi}_ntl_100m.tif'
     project_raster(src_filename,match_filename,dst_filename,gdalconst.GRA_Average,1)
     
-    src_filename=f'./Roads/{roi}_roads.tif'
-    dst_filename=f'./100m/{roi}_roads_100m.tif'
+    src_filename=f'./data/roads/{roi}_roads.tif'
+    dst_filename=f'./data/100m/{roi}_roads_100m.tif'
     project_raster(src_filename,match_filename,dst_filename,gdalconst.GRA_NearestNeighbour,1)
     
-    src_filename=f'./land_cover/landcover_2019.tif'
-    dst_filename=f'./100m/{roi}_landcover_100m.tif'
+    src_filename=f'./data/hrsl/hrsl.tif'
+    dst_filename=f'./data/100m/{roi}_hrsl_100m.tif'
+    project_raster(src_filename,match_filename,dst_filename,gdalconst.GRA_Max,1)
+    
+    src_filename=f'./data/land_cover/landcover_2019.tif'
+    dst_filename=f'./data/100m/{roi}_landcover_100m.tif'
     project_raster(src_filename,match_filename,dst_filename,gdalconst.GRA_NearestNeighbour,1)
     landcover = imread(dst_filename).astype('uint8')
     converted = conv_class(landcover)
@@ -131,6 +135,7 @@ def process_district(roi):
     converted = converted_enc
     imsave(dst_filename,converted)
     
-    proximity_raster(f'./100m/{roi}_roads_100m.tif',f'./100m/{roi}_roads_dist_100m.tif')
+    proximity_raster(f'./data/100m/{roi}_roads_100m.tif',f'./data/100m/{roi}_roads_dist_100m.tif')
     
-    building_area(roi,'./buildings/spaceSUR/pred/')
+    for i,path in enumerate(model_paths):    
+        building_area(roi,f'{path}pred/',cat=model_names[i])

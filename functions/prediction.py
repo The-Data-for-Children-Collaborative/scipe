@@ -55,12 +55,12 @@ def cross_val(reg_master,df,features,target,return_models=False,log=False): # re
         scaler = StandardScaler()
         X_train = scaler.fit_transform(X_train)
         X_val = scaler.transform(X_val)
-        # include district variable
+
         # fit model with grid search
         gs = reg.fit(X_train, Y_train)
         model = gs.best_estimator_
         #print(model.intercept_)
-        
+ 
         # append predictions and model
         y_pred += list(model.predict(X_val))
         models.append(model)
@@ -70,3 +70,5 @@ def cross_val(reg_master,df,features,target,return_models=False,log=False): # re
         return (np.array(y_pred), models)
     else:
         return np.array(y_pred)
+    
+    
