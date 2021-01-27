@@ -43,19 +43,22 @@ def load_rasters(roi,model_names): # run preprocessing then load master list of 
         rasters.append(imread(f'{raster_path}{roi}_building_area_{name}_100m.tif').astype('float32'))
     return rasters
 
-def get_context(raster,y,x): # return mean of 3x3 context area surrounding point (x,y) of raster
-    def in_bounds(raster,y,x):
+def in_bounds(raster,y,x):
         return 0 <= y < raster.shape[0] and 0 <= x < raster.shape[1]
-    vals = [raster[i,j] for i in [y-1,y,y+1] for j in [x-1,x,x+1] if in_bounds(raster,i,j)]
+
+def get_context(raster,y,x,n): # return mean of n x n context area surrounding point (x,y) of raster
+    vals = [raster[i,j] for i in range(y+(1-n)//2,y+(1+n)//2) 
+            for j in range(x+(1-n)//2,x+(1+n)//2) if in_bounds(raster,i,j)]
     return np.mean(np.array(vals), axis=0)
 
-def construct_dataset(feature_names,rasters,pop,context=True): # construct dataframe from rasters, survey
+def construct_dataset(feature_names,rasters,pop,context=True,context_sizes=[3]): # construct dataframe from rasters, survey
     d = {'x':[],'y':[]} # coordinates used to perform validation split spatially
     for f in feature_names:
         d[f] = []
     if context:
-        for f in feature_names:
-            d[f'{f}_context'] = []
+        for size in context_sizes:
+            for f in feature_names:
+                d[f'{f}_context_{size}x{size}'] = []
     d['pop'] = []
     df = pd.DataFrame(d)
     count = 0
@@ -68,9 +71,12 @@ def construct_dataset(feature_names,rasters,pop,context=True): # construct dataf
                 for r in rasters:
                     row = np.append(row,r[i,j])
                 if context: # consider context around cell
-                    for r in rasters:
-                        row = np.append(row,get_context(r,i,j))
+                    for size in context_sizes:
+                        for r in rasters:
+                            row = np.append(row,get_context(r,i,j,size))
+                            #print(row.shape[0])
                 row = np.append(row,n)
+                #print(row.shape)
                 df.loc[count] = row
                 count+=1
     df['x'] = df['x'].astype(int)

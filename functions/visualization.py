@@ -7,11 +7,29 @@ from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from yellowbrick.style.palettes import LINE_COLOR
 from yellowbrick.bestfit import draw_best_fit, draw_identity_line
-from sklearn.metrics import r2_score, mean_absolute_error
+from sklearn.metrics import r2_score, median_absolute_error
 from tqdm import tqdm
 import pandas as pd
 
-from functions.scoring import meape
+from functions.scoring import meape, ameape, aggregate_percent_error
+
+# plot validation folds in df spatially
+def plot_folds(df,figsize=(4.5,9),bbox=(1.75, 1)):
+    xs_folds = [df.loc[df['fold'] == i]['x'].values for i in range(4)]
+    ys_folds = [df.loc[df['fold'] == i]['y'].values for i in range(4)]
+    f, ax = plt.subplots(figsize=figsize)
+    for fold in range(4):
+        if fold == 3:
+            ax.scatter(xs_folds[fold],ys_folds[fold],s=15,marker='s',c='purple',alpha=0.4,label=f'Fold {fold}')
+        else:
+            ax.scatter(xs_folds[fold],ys_folds[fold],s=15,marker='s',alpha=0.4,label=f'Fold {fold}')
+    ax.invert_yaxis()
+    ax.axis('scaled')
+    ax.legend(loc='upper right',bbox_to_anchor=bbox)
+    ax.axes.xaxis.set_visible(False)
+    ax.axes.yaxis.set_visible(False)
+    f.tight_layout()
+    return f,ax
 
 # returns (img,buildings) pair where img and buildings are numpy arrays representing the satellite image and building estimates corresponding to (x,y) survey cell for roi
 def get_tiles(x,y,roi,tiles_path):
@@ -25,7 +43,8 @@ def get_tiles_df(df,i,tiles_path):
     roi = row['roi']
     return get_tiles(x,y,roi,tiles_path)
 
-def prediction_error(df,true='pop',pred='pop_pred',ax=None,images=False,buildings=False,tiles_path=None,color=False): # plot predicted (df[pred]) vs observed (df[true])
+# plot predicted (df[pred]) vs observed (df[true])
+def prediction_error(df,true='pop',pred='pop_pred',ax=None,images=False,buildings=False,tiles_path=None,color=True,show_metrics=False):
     # initialize plot and axis
     if not ax:
         f, ax = plt.subplots(figsize=(5,5))
@@ -33,7 +52,7 @@ def prediction_error(df,true='pop',pred='pop_pred',ax=None,images=False,building
     Y_true = df[true]
     Y_pred = df[pred]
     # plot data
-    label = f"$R^2 = {r2_score(Y_true,Y_pred):0.3f}$\n$MeAPE = {meape(Y_true,Y_pred):0.3f}$\n$MAE = {mean_absolute_error(Y_true,Y_pred):0.2f}$"
+    label = f"$R^2 = {r2_score(Y_true,Y_pred):0.3f}$\n$MeAPE = {meape(Y_true,Y_pred):0.3f}$\n$aMeAPE = {ameape(Y_true,Y_pred):0.3f}$\n$MeAE = {median_absolute_error(Y_true,Y_pred):0.2f}$"
     if not (images or buildings):
         if color and (not df is None):
             for i,roi in enumerate(df['roi'].unique()):
@@ -66,12 +85,13 @@ def prediction_error(df,true='pop',pred='pop_pred',ax=None,images=False,building
     # Draw the 45 degree line
     draw_identity_line(ax=ax,ls="--",lw=2,c=LINE_COLOR,alpha=0.5,label="identity")
     
-    # Annotate
-    #ax.text(40,100,label)
-    ax.text(0.5, 0.98, label,
-        horizontalalignment='center',
-        verticalalignment='top',
-        transform=ax.transAxes)
+    if show_metrics:
+        # Annotate
+        #ax.text(40,100,label)
+        ax.text(0.5, 0.98, label,
+            horizontalalignment='center',
+            verticalalignment='top',
+            transform=ax.transAxes)
 
     # Set the axes labels
     ax.set_ylabel(r"$\hat{y}$")
@@ -94,15 +114,16 @@ def prediction_error(df,true='pop',pred='pop_pred',ax=None,images=False,building
             ab = AnnotationBbox(img, (row['pop'], row['pop_pred']), frameon=False)
             ax.add_artist(ab)
 
-# returns latex table comparing model performance 
-# dataframe df contains true values and predicted values for each model
-# models is a list of model names used to index the dataframe
-# true is the column name of the true population value
+""" Returns latex table comparing model performance 
+    dataframe df contains true values and predicted values for each model
+    models is list of model names used to index the dataframe
+    true is the column name of the true population value """
 def get_table(df,models,true='pop'):
-    r2 = [f'{r2_score(df[true],df[model]):0.3f}' for model in models]
-    meapes = [f'{meape(df[true],df[model]):0.3f}' for model in models]
-    mae = [f'{mean_absolute_error(df[true],df[model]):0.2f}' for model in models]
-    d = {'Model': models,'$R^2$':r2,'$MeAPE$':meapes,'$MAE$':mae}
+    r2 = [f'{r2_score(df[true],df[model]):0.3g}' for model in models]
+    meapes = [f'{meape(df[true],df[model])*100:0.3g}%' for model in models]
+    mae = [f'{median_absolute_error(df[true],df[model]):0.2f}' for model in models]
+    agg_error = [f'{aggregate_percent_error(df[true],df[model])*100:0.3g}%' for model in models]
+    d = {'Model': models,'$R^2$':r2,'$MeAPE$':meapes,'$MAE$':mae,'$AgPE$':agg_error}
     df = pd.DataFrame(d)
     return df.to_latex(caption='Model performance',index=False)
 
@@ -125,7 +146,7 @@ def merge(image,buildings,threshold=0.5):
     return image
 
 def display_pair(img,buildings,axarr=None,points=None):
-    if not axarr:
+    if axarr is None:
         _, axarr = plt.subplots(1,3,figsize=(8,5))
     axarr[0].imshow(img)
     if points:
@@ -159,3 +180,47 @@ def to_pdf(survey,count,roi,tiles_path,out_path,points=None,coords=None): # retu
                         plt.close()
                         writer.writerow([x,y,i])
                         i += 1
+                        
+                        
+def get_colors(n,offset=0.7):
+    cmap = plt.cm.get_cmap('hsv')
+    colors = np.array([cmap((offset+(i)/n)%1) for i in range(n)])
+    return colors
+
+def feature_importance(models,features,colors):
+    f, ax = plt.subplots(figsize=(10,5))
+    importances = []
+    
+    model_type = type(models[0]).__name__
+    y_label = ''
+    if model_type == 'RandomForestRegressor':
+        importances = np.array([model.feature_importances_ for model in models])
+        y_label = 'Importance'
+    elif model_type == 'PoissonRegressor' or 'Lasso':
+        importances = np.array([model.coef_ for model in models])
+        y_label = 'Coefficient Magnitude'
+    else:
+        print("Unsuported model")
+        return
+    
+    n = np.arange(importances.shape[1])
+    
+    means = np.mean(importances,axis=0)
+    stds = np.std(importances,axis=0)
+    
+    idxs = np.argsort(means,axis=0)[::-1]
+    means = means[idxs]
+    stds = stds[idxs]
+    labels = features[idxs]
+    colors_sorted = colors[idxs]
+    
+    ax.bar(n,means,yerr=stds,color=colors_sorted,error_kw={'capsize':2.5,'capthick':1.0})
+    ax.set_xticks(n)
+    ax.set_xticklabels(labels,rotation=90)
+    
+    ax.set_ylabel(y_label)
+    ax.set_xlabel('Feature')
+    
+    ax.set_title(f'Feature importance for {model_type}')
+    
+    return (f,ax)

@@ -31,7 +31,7 @@ def load_dataset(train_dir, val_dir, target_size, batch_size, ratio): # load dat
     # load training data
     X_train = np.array([img_to_array(load_img(os.path.join(train_dir,files_train[i]),target_size=target_size)) for i in tqdm(idxs,position=0,leave=True)])
     Y_train = np.array([img_to_array(load_img(os.path.join(train_dir,files_train[i]).replace('images','labels'),target_size=target_size)) for i in tqdm(idxs,position=0,leave=True)])
-    beta = Y_train.size / (np.sum(Y_train) * 10)
+    beta = Y_train.size / (np.sum(Y_train) * 5)
     print(f'Loaded {idxs.shape[0]} out of {n} training images to memory', flush=True)
     
     # load validation data
@@ -129,7 +129,7 @@ def train(train_dir,val_dir,batch_size=8,epochs=1,model_path=None,target_size=(2
         # sample data to fit datagen and compute beta
         X_sample = sample_data(train_dir+'images/data/',n_samples,target_size)
         Y_sample = sample_data(train_dir+'labels/data/',n_samples,target_size)
-        beta = Y_sample.size / (np.sum(Y_sample) * 10)
+        beta = Y_sample.size / (np.sum(Y_sample) * 5)
         print(f'Beta: {beta:.2f}')
         # initialize iterators to flow data from disk
         train_iterator, train_length = get_iterator(train_dir,batch_size,X_sample,target_size)

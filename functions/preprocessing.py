@@ -2,45 +2,68 @@ from osgeo import gdal, gdalconst
 from tifffile import imread, imsave
 from shutil import copyfile
 import numpy as np
+import json
 import os
 
-def project_raster(src_filename,match_filename,dst_filename,resampling,n_bands):
-    #source
-    src_ds = gdal.Open(src_filename, gdalconst.GA_ReadOnly)
-    src_proj = src_ds.GetProjection()
-    src_geotrans = src_ds.GetGeoTransform()
+from functions.utilies import project_raster, proximity_raster
 
-    #raster to match
-    match_ds = gdal.Open(match_filename, gdalconst.GA_ReadOnly)
-    match_proj = match_ds.GetProjection()
-    match_geotrans = match_ds.GetGeoTransform()
+resamplers_table = {'average': gdalconst.GRA_Average, 'nearest': gdalconst.GRA_NearestNeighbour, 'max': gdalconst.GRA_Max}
 
-    #output/destination
-    dst = gdal.GetDriverByName('Gtiff').Create(dst_filename, match_ds.RasterXSize, match_ds.RasterYSize, n_bands, gdalconst.GDT_Float32)
-    dst.GetRasterBand(1).SetNoDataValue(0)
-    dst.SetGeoTransform(match_geotrans)
-    dst.SetProjection(match_proj)
-
-    gdal.ReprojectImage(src_ds, dst, src_proj, match_proj, resampling)
-
-    del dst # flush to save to disk
+'''
+    For each roi, reproject input rasters to the relevant reference grid, using
+    dictated resampling method.
     
-def proximity_raster(src_filename,dst_filename):
-    #source
-    src_ds = gdal.Open(src_filename, gdalconst.GA_ReadOnly)
-    src_proj = src_ds.GetProjection()
-    src_geotrans = src_ds.GetGeoTransform()
+            Parameters:
+                    in_dir (str): The path to the input data directory
+                    in_rasters (str): The names of input rasters within in_dir
+                    ref_rasters (list): The path to reference grid for each roi
+                    out_dir (str): The output directory
+                    rois (list): The names of rois
+                    resampling (list): The resampling technique used for each input raster
 
-    #output/destination
-    dst = gdal.GetDriverByName('Gtiff').Create(dst_filename, src_ds.RasterXSize, src_ds.RasterYSize, 1, gdalconst.GDT_Float32)
-    dst.GetRasterBand(1).SetNoDataValue(-1)
-    dst.SetGeoTransform(src_geotrans)
-    dst.SetProjection(src_proj)
+            Returns:
+                    None
+'''
+def reproject_data(in_dir,in_rasters,ref_rasters,out_dir,rois,resampling):
+    for i,roi in rois:
+        ref_path = ref_rasters[i]
+        for j,raster in enumerate(in_rasters):
+            in_path = os.path.join(in_dir,raster)
+            out_path = os.path.join(*[out_dir,roi,raster])
+            project_raster(in_path,ref_path,out_path,resampling[j])
 
-    gdal.ComputeProximity(src_ds.GetRasterBand(1), dst.GetRasterBand(1), ["DISTUNITS=GEO"])
-
-    del dst # flush to save to disk
+            
+'''
+    Preprocess data according to specifications in file params_path. All
+    output is to disk.
     
+            Parameters:
+                    params_path (str): A JSON file holding parameters
+
+            Returns:
+                    None
+'''
+def preprocess_data(params_path):
+    
+    # load and parse params
+    params = {}
+    with open(params_path,'r') as f:
+        params = json.load(f)                        
+    rois = params['rois']
+    in_dir = params['input_dir']
+    in_rasters = params['input_rasters']
+    resampling = [resamplers_table[r] for r in params['resampling']]
+    out_dir = params['output_dir']
+    pop_rasters = params['pop_rasters'] # one for each roi
+    
+    # rasterize vector data 
+    
+    # reproject data to reference grid                   
+    reproject_data(in_dir,in_rasters,pop_rasters,out_dir,rois,resampling)
+    
+    # compute indices and simplify landcover
+
+
 def building_area(roi,building_path,cat='spacesur'):
     shape = imread(f'./data/pop/{roi}_pop.tif').shape
     area_raster = np.zeros(shape)
@@ -55,30 +78,12 @@ def building_area(roi,building_path,cat='spacesur'):
     imsave(f'./data/100m/{roi}_building_area_{cat}_100m.tif',area_raster)
     
 def conv_class(raster): # lookup table for land cover classification simplification
-    d = {}
-    d['0'] = 0 # no data
-    d['111'] = 1 # closed forest
-    d['112'] = 1 # closed forest
-    d['113'] = 1 # closed forest
-    d['114'] = 1 # closed forest
-    d['115'] = 1 # closed forest
-    d['116'] = 1 # closed forest
-    d['121'] = 2 # open forest
-    d['122'] = 2 # open forest
-    d['123'] = 2 # open forest
-    d['124'] = 2 # open forest
-    d['125'] = 2 # open forest
-    d['126'] = 2 # open forest
-    d['20'] = 3 # shrubs
-    d['30'] = 4 # herbaceous vegetation
-    d['90'] = 5 # herbaceous wasteland
-    d['100'] = 6 # moss and lichen
-    d['60'] = 7 # bare/sparse vegetation
-    d['40'] = 8 # cropland
-    d['50'] = 9 # urban/built up
-    d['70'] = 10 # snow and ice
-    d['80'] = 11 # permanent water body
-    d['200'] = 12 # open sea
+    # 0 = no data, 1 = closed forest, 2 # open forest, 3 = shrubs, 4 = herbaceous vegetation, 
+    # 5 = herbaceous wasteland, 6 = moss and lichen, 7 = bare/sparse vegetation, 8 = cropland,
+    # 9 = urban/built up, 10 = snow and ice, 11 = permanent water body, 12 = open sea
+    d = {'0': 0, '111': 1, '112': 1, '113': 1, '114': 1, '115': 1, '116': 1, '121': 2,
+         '122': 2, '123': 2, '124': 2, '125': 2, '126': 2, '20': 3, '30': 4, '90': 5,
+         '100': 6, '60': 7, '40': 8, '50': 9, '70': 10, '80': 11, '200': 12}
     # convert raster
     for i in range(raster.shape[0]):
         for j in range(raster.shape[1]):

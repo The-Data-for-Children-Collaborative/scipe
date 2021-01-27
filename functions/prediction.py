@@ -59,6 +59,7 @@ def cross_val(reg_master,df,features,target,return_models=False,log=False): # re
         # fit model with grid search
         gs = reg.fit(X_train, Y_train)
         model = gs.best_estimator_
+        print(reg.best_params_)
         #print(model.intercept_)
  
         # append predictions and model
