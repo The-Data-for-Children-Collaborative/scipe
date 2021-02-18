@@ -17,11 +17,30 @@ from functions.footprints.dice import dice_coef
 from functions.footprints.vgg16_unet_model import get_vgg16
 
 def model_from_json(path):
+    '''Load model from json'''
     with open(path, 'r') as json_file:
         model = json.dumps(json.load(json_file))
         return  tf.keras.models.model_from_json(model)
     
 def load_dataset(train_dir, val_dir, target_size, batch_size, ratio): # load dataset directly to memory, including <ratio> proportion of training images
+    '''
+    Load semantic segmentation dataset to memory in the form of training and validation iterators.
+    
+        Args:
+                train_dir (str): The path to the directory containing training data.
+                val_dir (str): The path to the directory containing validation data.
+                target_size (tuple): The target size (height,width) of loaded images.
+                batch_size (int): The batch size of the iterators.
+                ratio (float): The percentage of data to load from the training directory.
+
+        Returns:
+                train_iterator (tf.keras.preprocessing.image.Iterator): iterator of training (image,label) pairs.
+                train_size (int): number of batches in train_iterator.
+                val_iterator (tf.keras.preprocessing.image.Iterator): iterator of validation (image,label) pairs.
+                val_size (int): number of batches in val_iterator.
+                beta (float): weight hyperparam for loss function calculated from training set.
+                    
+    '''
     train_dir += 'images/data/'
     val_dir += 'images/data/'
     files_train = np.array(os.listdir(train_dir))
@@ -63,10 +82,15 @@ def load_dataset(train_dir, val_dir, target_size, batch_size, ratio): # load dat
     # zip and return iterators along with lengths, and beta
     train_iterator = zip(train_image_iterator,train_label_iterator)
     val_iterator = zip(val_image_iterator,val_label_iterator)
-    return train_iterator, len(train_image_iterator), val_iterator, len(val_image_iterator), beta
+    
+    # get sizes
+    train_size = len(train_image_iterator)
+    val_size = len(val_image_iterator)
+    return train_iterator, train_size, val_iterator, val_size, beta
     
     
-def sample_data(path,count,target_size): # sample <count> images from <path>, scaled to <target_size>
+def sample_data(path,count,target_size):
+    ''' Sample count images from path, scaled to target_size. '''
     print(f'Sampling {count} images from {path}',flush=True)
     ls = np.array(os.listdir(path))
     n = ls.shape[0]
@@ -75,6 +99,7 @@ def sample_data(path,count,target_size): # sample <count> images from <path>, sc
     return np.array(xs)
 
 def get_image_iterator(path,X_sample,batch_size,target_size): # returns iterator for images in <path> from disk
+    ''' Get image iterator loading images in path from disk, fit to X_sample. '''
     image_datagen = ImageDataGenerator(
         featurewise_center=True,
         featurewise_std_normalization=True,
@@ -90,6 +115,7 @@ def get_image_iterator(path,X_sample,batch_size,target_size): # returns iterator
     return image_iterator
 
 def get_label_iterator(path,batch_size,target_size): # returns iterator for labels in <path> from disk
+    ''' Get label iterator loading images in path from disk. '''
     label_datagen = ImageDataGenerator() 
     label_iterator = label_datagen.flow_from_directory(
         path,
@@ -102,11 +128,13 @@ def get_label_iterator(path,batch_size,target_size): # returns iterator for labe
     return label_iterator
 
 def get_iterator(path,batch_size,X_sample,target_size): # returns iterator for (image,label) pairs in <path> from disk
+    ''' Get (image,label) pair iterator, fit to X_sample, loading pairs in path from disk. '''
     image_iterator = get_image_iterator(path+'images/',X_sample,batch_size,target_size)
     label_iterator = get_label_iterator(path+'labels/',batch_size,target_size)
     return (zip(image_iterator,label_iterator),len(image_iterator))
 
 def fit_model(model,train_iterator,val_iterator,train_length,val_length,epochs,batch_size,callbacks):
+    ''' Fit provided model with parameters '''
     hist = model.fit(train_iterator,
                  steps_per_epoch = train_length,
                  validation_data = val_iterator,
@@ -114,12 +142,31 @@ def fit_model(model,train_iterator,val_iterator,train_length,val_length,epochs,b
                  batch_size=batch_size, epochs=epochs, verbose=1, callbacks=callbacks)
     return hist
 
-""" Train semantic segmentation model on (image,label) pairs from train_dir, validate on pairs from val_dir
+""" 
     model_path specifies path of pretrained model, where applicable
     from_disk specifies if data should flow from disk (True) or be loaded into memory (False)
     ratio sets the ratio of data in train_dir to be used - only applicable if from_disk is False
                                                                                                 """
 def train(train_dir,val_dir,batch_size=8,epochs=1,model_path=None,target_size=(256,256),n_samples=1000,train_from_disk=False,ratio=1.0,callbacks=[]):
+    '''
+    Train semantic segmentation model on (image,label) pairs.
+    
+            Args:
+                    train_dir (str): The directory containing training pairs
+                    val_dir (str): The directory containing validation pairs
+                    batch_size (:obj:`int`, optional) The batch size used when training. Defaults to 8.
+                    epochs (:obj:`int`, optional): The number of epochs to train for. Defaults to 1.
+                    model_path (:obj:`str`, optional): The path to the model to load as base for training. If no path is specified, the model is trained from scratch. Defaults to None.
+                    target_size (:obj:`tuple`, optional): The target_size to load images and labels to. Defaults to (256,256).
+                    n_samples (:obj:`int`, optional): The number of samples to use when determining loss weighting and featurewise mean/std of images. Defaults to 1000.
+                    train_from_disk (:obj:`bool`, optional): Whether to train on data from disk (True) or from memory (False). Defaults to False.
+                    ratio (:obj:`float`, optional): The percentage of data to train with. Only affects result when train_from_disk is False. Defaults to 1.0.
+                    callbacks (:obj:`list`,optional): List of Keras callbacks to apply while training. Defaults to [].
+                        
+        Returns:
+                    model (tf.keras.Model): The trained model.
+                    hist (dict): The training history.
+    '''
     # initialize variables to be populated during conditional
     train_iterator, train_length = None, 0
     val_iterator, val_length = None, 0

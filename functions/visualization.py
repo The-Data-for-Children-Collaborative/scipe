@@ -55,7 +55,7 @@ def prediction_error(df,true='pop',pred='pop_pred',ax=None,images=False,building
     label = f"$R^2 = {r2_score(Y_true,Y_pred):0.3f}$\n$MeAPE = {meape(Y_true,Y_pred):0.3f}$\n$aMeAPE = {ameape(Y_true,Y_pred):0.3f}$\n$MeAE = {median_absolute_error(Y_true,Y_pred):0.2f}$"
     if not (images or buildings):
         if color and (not df is None):
-            for i,roi in enumerate(df['roi'].unique()):
+            for i,roi in enumerate(sorted(df['roi'].unique())):
                 df_roi = df[df['roi']==roi]
                 ax.scatter(df_roi[true],df_roi[pred], alpha=0.75, label=roi, s=25)
         else:
@@ -187,8 +187,10 @@ def get_colors(n,offset=0.7):
     colors = np.array([cmap((offset+(i)/n)%1) for i in range(n)])
     return colors
 
-def feature_importance(models,features,colors):
-    f, ax = plt.subplots(figsize=(10,5))
+def feature_importance(models,features,colors,crop=True,n_show=10):
+    if not crop:
+        n_show = 35
+    f, ax = plt.subplots(figsize=(n_show//2.5,5))
     importances = []
     
     model_type = type(models[0]).__name__
@@ -203,10 +205,19 @@ def feature_importance(models,features,colors):
         print("Unsuported model")
         return
     
-    n = np.arange(importances.shape[1])
+    # n = np.arange(importances.shape[1])
     
     means = np.mean(importances,axis=0)
     stds = np.std(importances,axis=0)
+    
+    if crop:
+        idxs_large = np.argsort(np.absolute(means))[::-1][:n_show]
+        means = means[idxs_large]
+        stds = stds[idxs_large]
+        features = features[idxs_large]
+        colors = colors[idxs_large]
+    
+    n = np.arange(means.shape[0])
     
     idxs = np.argsort(means,axis=0)[::-1]
     means = means[idxs]
@@ -216,7 +227,7 @@ def feature_importance(models,features,colors):
     
     ax.bar(n,means,yerr=stds,color=colors_sorted,error_kw={'capsize':2.5,'capthick':1.0})
     ax.set_xticks(n)
-    ax.set_xticklabels(labels,rotation=90)
+    ax.set_xticklabels(labels,rotation=45,ha='right') 
     
     ax.set_ylabel(y_label)
     ax.set_xlabel('Feature')
