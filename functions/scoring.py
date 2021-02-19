@@ -22,6 +22,7 @@ def meape(y_true,y_pred):
     ''' Calculate median absolute percentage error '''
     abs_percentage_errors = []
     for true,pred in zip(y_true,y_pred):
+        assert true != 0
         abs_percentage_errors.append(abs((true-pred)/true))
     return np.median(abs_percentage_errors)
 

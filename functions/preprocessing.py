@@ -13,7 +13,7 @@ lcc_class_values = {'0': 0, '111': 1, '112': 1, '113': 1, '114': 1, '115': 1, '1
 # 9 = urban/built up, 10 = snow and ice, 11 = permanent water body, 12 = open sea
 
 lcc_class_names = {0:'no_data',1:'closed_forest',2:'open_forest',3:'shrubs',4:'hb_veg',5:'hb_waste',
-                  6:'moss',7:'sparse',8:'crop',9:'urban',10:'snow',11:'water',12:'sea'}
+                  6:'moss',7:'sparse',8:'cropland',9:'urban',10:'snow',11:'water',12:'sea'}
 
 from functions.utilities import project_raster, proximity_raster
 

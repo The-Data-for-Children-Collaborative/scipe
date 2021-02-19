@@ -87,7 +87,7 @@ def estimate_footprints(roi,survey,img_dir,model_paths,context_sizes,n_samples=1
                     None.
     '''
     context_size = max(context_sizes)
-    mean, std = learn_distribution(img_dir),n_samples)
+    mean, std = learn_distribution(img_dir,n_samples)
     print(mean,std)
     models = load_models(model_paths)
     visited = set()

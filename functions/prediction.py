@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
+import subprocess
 import os
 from tifffile import imread
 from tqdm import tqdm
@@ -29,7 +30,7 @@ def get_split(df,k):
     print(f'Training on {len(df_train)} samples, validating on {len(df_val)}, {(1-ratio)*100:.0f}/{ratio*100:.0f} split')
     return df_train, df_val
     
-def cross_val(reg_master,df,features,target,return_models=True,log=False):
+def cross_val(reg_master,df,features,target,return_models=True,log=False,huber=False):
     ''' Train regression model using cross-validation on dataframe pre-split into folds 
                 Args:
                         reg_master (sklearn.model_selection.GridSearchCV): A grid search instance to be trained.
@@ -57,10 +58,10 @@ def cross_val(reg_master,df,features,target,return_models=True,log=False):
         df_train, df_val = get_split(df,i)
         
         # convert dataframes to numpy arrays
-        X_train = df_train[features].to_numpy()
-        Y_train = df_train[target].to_numpy().ravel()
-        X_val = df_val[features].to_numpy()
-        Y_val = df_val[target].to_numpy().ravel()
+        X_train = df_train[features].to_numpy(copy=True)
+        Y_train = df_train[target].to_numpy(copy=True).ravel()
+        X_val = df_val[features].to_numpy(copy=True)
+        Y_val = df_val[target].to_numpy(copy=True).ravel()
         
         if log:
             Y_train = np.log(Y_train)
@@ -70,15 +71,20 @@ def cross_val(reg_master,df,features,target,return_models=True,log=False):
         scaler = StandardScaler()
         X_train = scaler.fit_transform(X_train)
         X_val = scaler.transform(X_val)
-
-        # fit model with grid search
-        gs = reg.fit(X_train, Y_train)
-        model = gs.best_estimator_
-        print(reg.best_params_)
-        #print(model.intercept_)
+        
+        model = None
+        
+        if huber: # messy workaround
+            y_pred += list(huber_regression(X_train,Y_train,X_val,Y_val))
+        else:
+            # fit model with grid search
+            gs = reg.fit(X_train, Y_train)
+            model = gs.best_estimator_
+            print(reg.best_params_)
+            y_pred += list(model.predict(X_val))
+            #print(model.intercept_)
  
         # append predictions and model
-        y_pred += list(model.predict(X_val))
         models.append(model)
     if log:
         y_pred = np.exp(y_pred)
@@ -86,5 +92,27 @@ def cross_val(reg_master,df,features,target,return_models=True,log=False):
         return (np.array(y_pred), models)
     else:
         return np.array(y_pred)
+    
+def huber_regression(X_train,y_train,X_val,y_val):
+    # save data to file
+    np.savetxt('./csv/X_train.csv', X_train, delimiter=',') 
+    np.savetxt('./csv/y_train.csv', y_train, delimiter=',')
+    np.savetxt('./csv/X_val.csv', X_val, delimiter=',')
+    np.savetxt('./csv/y_val.csv', y_val, delimiter=',')
+    
+    # run huber regression in R
+    subprocess.run(['rscript', './functions/run_huber.r'],check=False)
+    
+    # load predictions
+    y_pred = np.loadtxt('./csv/y_pred.csv', delimiter=',', skiprows=1)
+    
+    # clean up
+    os.remove('./csv/X_train.csv')
+    os.remove('./csv/y_train.csv')
+    os.remove('./csv/X_val.csv')
+    os.remove('./csv/y_val.csv')
+    os.remove('./csv/y_pred.csv')
+    
+    return y_pred
     
     

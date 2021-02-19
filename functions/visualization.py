@@ -159,7 +159,7 @@ def display_pair(img,buildings,axarr=None,points=None):
     axarr[1].imshow(buildings)
     axarr[2].imshow(buildings)
     
-def to_pdf(survey,count,roi,tiles_path,out_path,points=None,coords=None): # returns pdf displaying population labeled survey tiles
+def to_pdf(survey,roi,tiles_path,out_path,points=None,coords=None,outliers=None): # returns pdf displaying population labeled survey tiles
     plt.style.use('default')
     with PdfPages(out_path) as pdf:
         with open(f'{roi}.csv', 'w', newline='') as csvfile:
@@ -172,10 +172,16 @@ def to_pdf(survey,count,roi,tiles_path,out_path,points=None,coords=None): # retu
                         if coords:
                             if (y,x) not in coords:
                                 continue
+                        outlier = ''
+                        if outliers:
+                            if (y,x) in outliers:
+                                outlier = ', outlier = True'
+                            else:
+                                outlier = ', outlier = False'
                         img,buildings = get_tiles(x,y,roi,tiles_path)
                         f, axarr = plt.subplots(1,3,figsize=(12,5))
                         display_pair(img,to_img(buildings),axarr,points=points[y,x])
-                        f.suptitle(f'Population = {n}, x = {x}, y = {y}, count = {count[y,x]}')
+                        f.suptitle(f'Population = {n}, x = {x}, y = {y}{outlier}')
                         pdf.savefig()
                         plt.close()
                         writer.writerow([x,y,i])
