@@ -1,0 +1,32 @@
+{
+  "input_dir": "./data/raw/",
+  "input_rasters": [
+    "landsat.tif",
+    "ntl.tif",
+    "landcover.tif",
+    "hrsl.tif"
+  ],
+  "resampling": [
+    "average",
+    "average",
+    "nearest",
+    "max"
+  ],
+  "indices": ["ndvi","ndwi"],
+  "rois": ["boa","mgd"],
+  "pop_rasters": [
+    "./data/pop/boa_pop.tif",
+    "./data/pop/mgd_pop.tif"
+  ],
+  "output_dir": "./data/processed/",
+  "landcover": "landcover.tif",
+  "landsat": "landsat.tif",
+  "roads": "roads.tif",
+  "footprint_dirs" : [
+    "./spacenet/models/model_1_old/pred/",
+    "./spacesur/dataset_2/models/model_1/pred/",
+    "./spacesur/dataset_2/models/model_2/pred/"
+  ],
+  "model_names": ["sn","ss2_1","ss2_2"],
+  "thresholds": [0.5,0.2,0.5]
+}

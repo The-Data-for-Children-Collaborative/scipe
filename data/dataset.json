@@ -1,0 +1,13 @@
+{
+  "input_dir": "./data/processed/",
+  "rois": ["boa","mgd"],
+  "pop_rasters": [
+    "./data/pop/boa_pop.tif",
+    "./data/pop/mgd_pop.tif"
+  ],
+  "outliers_paths": [
+    "./outliers/boa_outliers_new.csv",
+    "./outliers/mgd_outliers_new.csv"
+  ],
+  "context_sizes": [3,5]
+}
