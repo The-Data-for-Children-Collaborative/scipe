@@ -70,17 +70,29 @@ def remove_outliers(df,outliers,strong=True,weak=True):
     return df
 
 # Return dataframe with outliers defined in csv file marked
-def mark_outliers(df,outliers,strong=True,weak=True):
+def mark_outliers(df,outliers,strong=True,weak=True,col=5):
     df['outlier'] = False
     with open(outliers) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         next(csv_reader) # skip header
         for row in csv_reader:
-            reject = int(row[5])
+            reject = int(row[col])
             if reject > 0:
                 if (reject == 1 and weak) or (reject==2 and strong):
                     x,y = int(row[0]), int(row[1])
                     df.loc[(df['x'] == x) & (df['y'] == y),'outlier'] = True
+    return df
+
+def mark_outliers_new(df,outliers,strong=True,weak=True,col=2):
+    df['outlier'] = False
+    with open(outliers) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        next(csv_reader) # skip header
+        for row in csv_reader:
+            reject = int(row[col])
+            if reject == 0:
+                x,y = int(row[0]), int(row[1])
+                df.loc[(df['x'] == x) & (df['y'] == y),'outlier'] = True
     return df
 
 def build_dataset(params_path): # construct dataframe from rasters, survey
@@ -142,7 +154,7 @@ def build_dataset(params_path): # construct dataframe from rasters, survey
         df['y'] = df['y'].astype(int)
         df['roi'] = roi
         df = label_folds(get_val_split(df))
-        df = mark_outliers(df,outliers_path,strong=True,weak=True)
+        df = mark_outliers_new(df,outliers_path)
         dfs.append(df)
     df = dfs[0]
     for df_i in dfs[1:]: # combine dataframes for each roi

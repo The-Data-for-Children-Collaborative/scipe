@@ -94,9 +94,11 @@ def prediction_error(df,true='pop',pred='pop_pred',ax=None,images=False,building
             transform=ax.transAxes)
 
     # Set the axes labels
-    ax.set_ylabel(r"$\hat{y}$")
-    ax.set_xlabel(r"$y$")
-    ax.legend(loc='upper left')
+    ax.set_ylabel(r"Predicted population")
+    ax.set_xlabel(r"Observed population")
+    legend = ax.legend(loc='upper left')
+    legend.get_frame().set_alpha(None)
+    legend.get_frame().set_facecolor((0.8, 0.8, 0.8, 1e-2))
     
     if (images or buildings) and (not df is None):
         if not tiles_path:

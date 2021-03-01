@@ -22,7 +22,7 @@ def model_from_json(path):
         model = json.dumps(json.load(json_file))
         return  tf.keras.models.model_from_json(model)
     
-def load_dataset(train_dir, val_dir, target_size, batch_size, ratio): # load dataset directly to memory, including <ratio> proportion of training images
+def load_dataset(train_dir, val_dir, target_size, batch_size, train_count):
     '''
     Load semantic segmentation dataset to memory in the form of training and validation iterators.
     
@@ -31,7 +31,7 @@ def load_dataset(train_dir, val_dir, target_size, batch_size, ratio): # load dat
                 val_dir (str): The path to the directory containing validation data.
                 target_size (tuple): The target size (height,width) of loaded images.
                 batch_size (int): The batch size of the iterators.
-                ratio (float): The percentage of data to load from the training directory.
+                train_count (int): The number of samples to load from the training dataset.
 
         Returns:
                 train_iterator (tf.keras.preprocessing.image.Iterator): iterator of training (image,label) pairs.
@@ -45,7 +45,7 @@ def load_dataset(train_dir, val_dir, target_size, batch_size, ratio): # load dat
     val_dir += 'images/data/'
     files_train = np.array(os.listdir(train_dir))
     n = files_train.shape[0]
-    idxs = np.random.randint(0, n, (int(n*ratio),)) # select random subset of images of size dictated by ratio
+    idxs = np.random.randint(0, n, train_count) # select random subset of images of size train_count
     
     # load training data
     X_train = np.array([img_to_array(load_img(os.path.join(train_dir,files_train[i]),target_size=target_size)) for i in tqdm(idxs,position=0,leave=True)])
@@ -142,12 +142,7 @@ def fit_model(model,train_iterator,val_iterator,train_length,val_length,epochs,b
                  batch_size=batch_size, epochs=epochs, verbose=1, callbacks=callbacks)
     return hist
 
-""" 
-    model_path specifies path of pretrained model, where applicable
-    from_disk specifies if data should flow from disk (True) or be loaded into memory (False)
-    ratio sets the ratio of data in train_dir to be used - only applicable if from_disk is False
-                                                                                                """
-def train(train_dir,val_dir,batch_size=8,epochs=1,model_path=None,target_size=(256,256),n_samples=1000,train_from_disk=False,ratio=1.0,callbacks=[]):
+def train(train_dir,val_dir,batch_size=8,epochs=1,beta=5,model_path=None,target_size=(256,256),n_samples=1000,train_from_disk=False,train_count=10000,callbacks=[]):
     '''
     Train semantic segmentation model on (image,label) pairs.
     
@@ -156,11 +151,12 @@ def train(train_dir,val_dir,batch_size=8,epochs=1,model_path=None,target_size=(2
                     val_dir (str): The directory containing validation pairs
                     batch_size (:obj:`int`, optional) The batch size used when training. Defaults to 8.
                     epochs (:obj:`int`, optional): The number of epochs to train for. Defaults to 1.
+                    beta (:obj:`float`, optional): The weighting parameter for loss function. Defaults to 5.
                     model_path (:obj:`str`, optional): The path to the model to load as base for training. If no path is specified, the model is trained from scratch. Defaults to None.
                     target_size (:obj:`tuple`, optional): The target_size to load images and labels to. Defaults to (256,256).
                     n_samples (:obj:`int`, optional): The number of samples to use when determining loss weighting and featurewise mean/std of images. Defaults to 1000.
                     train_from_disk (:obj:`bool`, optional): Whether to train on data from disk (True) or from memory (False). Defaults to False.
-                    ratio (:obj:`float`, optional): The percentage of data to train with. Only affects result when train_from_disk is False. Defaults to 1.0.
+                    train_count: (:obj:`int`, optional): TThe number of samples to load from the training dataset. Only affects result when train_from_disk is False. Defaults to 10000.
                     callbacks (:obj:`list`,optional): List of Keras callbacks to apply while training. Defaults to [].
                         
         Returns:
@@ -175,14 +171,11 @@ def train(train_dir,val_dir,batch_size=8,epochs=1,model_path=None,target_size=(2
     if train_from_disk: # load dataset from disk at runtime
         # sample data to fit datagen and compute beta
         X_sample = sample_data(train_dir+'images/data/',n_samples,target_size)
-        Y_sample = sample_data(train_dir+'labels/data/',n_samples,target_size)
-        beta = Y_sample.size / (np.sum(Y_sample) * 5)
-        print(f'Beta: {beta:.2f}')
         # initialize iterators to flow data from disk
         train_iterator, train_length = get_iterator(train_dir,batch_size,X_sample,target_size)
         val_iterator, val_length = get_iterator(val_dir,batch_size,X_sample,target_size)
     else: # preload dataset to memory
-        train_iterator, train_length, val_iterator, val_length, beta = load_dataset(train_dir,val_dir,target_size,batch_size,ratio)
+        train_iterator, train_length, val_iterator, val_length, beta = load_dataset(train_dir,val_dir,target_size,batch_size,train_count)
     # initialize model
     model = None
     if model_path: # load model from disk
