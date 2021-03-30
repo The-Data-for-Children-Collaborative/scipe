@@ -7,7 +7,7 @@ There are several scripts included with the project. They are intended to be run
 3. [`/scripts/run_pipeline.py`](./scripts/run_pipeline.py) `<path/to/config>` - run preprocessing, build dataset, predict population, and output results of experiments according to the config file.
 
 ## Config
-Each script takes a separate YAML config file as input, examples of each can be found in [`/scripts/config/`](./scripts/config/)
+Each script takes a separate YAML config file as input, examples of each can be found in [`/scripts/config/`](./scripts/config/).
 
 ## Examples
 Executing `run_pipeline.py` yields the following results for the example [`pipeline.yaml`](/scripts/config/pipeline.yaml):
