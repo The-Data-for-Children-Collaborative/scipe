@@ -1,0 +1,11 @@
+---
+# NOTE: Survey rasterization should be run from root of project, so define paths relative to there
+rois: [boa,mgd] # rois surveyed
+survey_paths: # survey for each roi
+    - ./data/survey_raw/surveys/sample_boa.dta
+    - ./data/survey_raw/surveys/sample_mgd.dta
+srs_paths: # spatial reference to use for output population raster for each roi
+    - ./data/survey_raw/grids/BOA_adm_gridcentroids-100m.shp
+    - ./data/survey_raw/grids/MGD_adm_gridcentroids-100m.shp
+out_dir: ./data/pop/ # where to output population rasters
+...

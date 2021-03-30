@@ -3,9 +3,11 @@ import numpy as np
 import simpledbf
 import matplotlib.pyplot as plt
 import math
+import os
 from osgeo import gdal, osr, ogr
 
-def get_extent(df): # returns extent of survey grid
+def get_extent(df):
+    ''' Return extent of survey cells contained within df '''
     xs = df['cell_x'].to_numpy()
     ys = df['cell_y'].to_numpy()
     # remove NaN
@@ -19,7 +21,8 @@ def get_extent(df): # returns extent of survey grid
     
     return (min_x,max_x,min_y,max_y)
 
-def get_arr(df,extent,feature,verbose=False): # returns array of target feature from survey dataframe
+def get_arr(df,extent,feature,verbose=False):
+    ''' Return numpy array of target feature from survey dataframe '''
     min_x,max_x,min_y,max_y = extent
     # Initialize population array using extent
     arr = np.zeros(((max_y-min_y)//100+1,(max_x-min_x)//100+1))
@@ -42,6 +45,7 @@ def get_arr(df,extent,feature,verbose=False): # returns array of target feature 
     return np.where(arr>0,arr,None) # set zero population grid elements to None so they save to image properly
 
 def arr_to_raster(out_file,origin,pixel_width,pixel_height,srs,array):
+    ''' Save survey array to raster '''
     ds = ogr.Open(srs)
     layer = ds.GetLayer()
     srs = layer.GetSpatialRef()
@@ -60,6 +64,7 @@ def arr_to_raster(out_file,origin,pixel_width,pixel_height,srs,array):
     outband.FlushCache()
     
 def df_to_raster(df,filename,srs_path,feature):
+    ''' Rasterize survey and save to disk '''
     # Calculate extent of sample grid
     extent = get_extent(df)
     min_x,_,min_y,max_y = extent
@@ -69,8 +74,25 @@ def df_to_raster(df,filename,srs_path,feature):
     arr_to_raster(filename,(min_x-50,max_y+50),100,100,srs_path,pop)
     
 def display_surveys(dfs):
+    ''' Plot survey rasters '''
     f, axarr = plt.subplots(1,len(dfs),figsize=(17.5,10))
     for i,df in enumerate(dfs):
         pop = get_arr(df,get_extent(df),'members_n')
         axarr[i].imshow(np.where(pop!=None,1,0))
+        
+def rasterize_survey(params):
+    ''' Process population survey for each roi according to params '''
+    rois = params['rois']
+    survey_paths = params['survey_paths']
+    srs_paths = params['srs_paths']
+    out_path = params['out_dir']
+    
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
+    
+    for (roi,survey_path,srs_path) in zip(rois,survey_paths,srs_paths):
+        print(f'Rasterizing {roi} survey... ',end='')
+        df = pd.read_stata(survey_path)
+        df_to_raster(df,os.path.join(out_path,f'{roi}_pop.tif'),srs_path,'members_n')
+        print('done.')
     

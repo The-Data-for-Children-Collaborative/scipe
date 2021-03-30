@@ -13,8 +13,8 @@ import pandas as pd
 
 from functions.scoring import meape, ameape, aggregate_percent_error
 
-# plot validation folds in df spatially
 def plot_folds(df,figsize=(4.5,9),bbox=(1.75, 1)):
+    ''' Return spatial plot of validation folds '''
     xs_folds = [df.loc[df['fold'] == i]['x'].values for i in range(4)]
     ys_folds = [df.loc[df['fold'] == i]['y'].values for i in range(4)]
     f, ax = plt.subplots(figsize=figsize)
@@ -33,18 +33,20 @@ def plot_folds(df,figsize=(4.5,9),bbox=(1.75, 1)):
 
 # returns (img,buildings) pair where img and buildings are numpy arrays representing the satellite image and building estimates corresponding to (x,y) survey cell for roi
 def get_tiles(x,y,roi,tiles_path):
+    ''' Return (img,buildings) pair of numpy arrays for roi survey tile (y,x) '''
     img = imread(f'{tiles_path}{roi}/images/{y}_{x}.tif')
     buildings = imread(f'{tiles_path}{roi}/buildings/{y}_{x}.tif')
     return (img,buildings)
 
 def get_tiles_df(df,i,tiles_path):
+    ''' Return (img,buildings) pair of numpy arrays for dataframe row i '''
     row = df.iloc[i]
     x,y = row['x'], row['y']
     roi = row['roi']
     return get_tiles(x,y,roi,tiles_path)
 
-# plot predicted (df[pred]) vs observed (df[true])
 def prediction_error(df,true='pop',pred='pop_pred',ax=None,images=False,buildings=False,tiles_path=None,color=True,show_metrics=False):
+    ''' Plot predicted (df[pred]) vs observed (df[true]) values from dataframe, optionally plot tile images/buildings over points '''
     # initialize plot and axis
     if not ax:
         f, ax = plt.subplots(figsize=(5,5))
@@ -64,42 +66,43 @@ def prediction_error(df,true='pop',pred='pop_pred',ax=None,images=False,building
     # draw line of best fit
     draw_best_fit(Y_true,Y_pred,ax,"linear",ls="--",lw=2,c=LINE_COLOR,label="best fit")
     
-    # Set the axes limits based on the range of X and Y data
+    # set the axes limits based on the range of X and Y data
     ax.set_xlim(Y_true.min() - 1, Y_true.max() + 1)
     ax.set_ylim(Y_pred.min() - 1, Y_pred.max() + 1)
 
-    # Square the axes to ensure a 45 degree line
+    # square the axes to ensure a 45 degree line
     ylim = ax.get_ylim()
     xlim = ax.get_xlim()
 
-    # Find the range that captures all data
+    # find the range that captures all data
     bounds = (min(ylim[0], xlim[0]), max(ylim[1], xlim[1]))
 
-    # Reset the limits
+    # reset the limits
     ax.set_xlim(bounds)
     ax.set_ylim(bounds)
 
-    # Ensure the aspect ratio is square
+    # ensure the aspect ratio is square
     ax.set_aspect("equal", adjustable="box")
 
-    # Draw the 45 degree line
+    # draw the 45 degree line
     draw_identity_line(ax=ax,ls="--",lw=2,c=LINE_COLOR,alpha=0.5,label="identity")
     
     if show_metrics:
-        # Annotate
-        #ax.text(40,100,label)
         ax.text(0.5, 0.98, label,
             horizontalalignment='center',
             verticalalignment='top',
             transform=ax.transAxes)
 
-    # Set the axes labels
+    # set the axes labels
     ax.set_ylabel(r"Predicted population")
     ax.set_xlabel(r"Observed population")
     legend = ax.legend(loc='upper left')
     legend.get_frame().set_alpha(None)
     legend.get_frame().set_facecolor((0.8, 0.8, 0.8, 1e-2))
     
+    ax.set_title(pred)
+    
+    # optionally plot images of tiles over points
     if (images or buildings) and (not df is None):
         if not tiles_path:
             print("Specify tiles path using kwarg tiles_path")
@@ -120,7 +123,7 @@ def prediction_error(df,true='pop',pred='pop_pred',ax=None,images=False,building
     dataframe df contains true values and predicted values for each model
     models is list of model names used to index the dataframe
     true is the column name of the true population value """
-def get_table(df,models,true='pop'):
+def get_table(df,models,true='pop'): # TODO: used?
     r2 = [f'{r2_score(df[true],df[model]):0.3g}' for model in models]
     meapes = [f'{meape(df[true],df[model])*100:0.3g}%' for model in models]
     mae = [f'{median_absolute_error(df[true],df[model]):0.2f}' for model in models]
@@ -206,9 +209,12 @@ def feature_importance(models,features,colors,crop=True,n_show=10):
     if model_type == 'RandomForestRegressor':
         importances = np.array([model.feature_importances_ for model in models])
         y_label = 'Importance'
-    elif model_type == 'PoissonRegressor' or 'Lasso':
+    elif model_type == 'PoissonRegressor' or model_type == 'Lasso':
         importances = np.array([model.coef_ for model in models])
         y_label = 'Coefficient Magnitude'
+    elif model_type == 'DummyRegressor':
+        importances = np.array([[0 for i in range(features.shape[0])] for model in models])
+        y_label = 'N/A'
     else:
         print("Unsuported model")
         return

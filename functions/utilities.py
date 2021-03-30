@@ -4,8 +4,22 @@ from shutil import copyfile
 import numpy as np
 import os
 
+def write_raster(arr,file_match,file_out,dtype=gdal.GDT_Float32):
+    ''' Write arr as geoTiff file_out with georeferencing of file_match '''
+    # load match dataset
+    ds_in = gdal.Open(file_match)
+    cols, rows = arr.shape[0:2]
+    # write data to matching raster
+    driver = gdal.GetDriverByName("GTiff")
+    ds_out = driver.Create(file_out, rows, cols, 1, dtype)
+    ds_out.SetGeoTransform(ds_in.GetGeoTransform())
+    ds_out.SetProjection(ds_in.GetProjection())
+    ds_out.GetRasterBand(1).WriteArray(arr[:,:,0])
+    ds_out.GetRasterBand(1).SetNoDataValue(0)
+    ds_out.FlushCache() # save to disk
 
 def project_raster(src_filename,match_filename,dst_filename,resampling,n_bands=0):
+    ''' Reproject source raster to match georeferencing of match raster, using specified resampling technique, write to disk. '''
     #source
     src_ds = gdal.Open(src_filename, gdalconst.GA_ReadOnly)
     src_proj = src_ds.GetProjection()
@@ -33,6 +47,7 @@ def project_raster(src_filename,match_filename,dst_filename,resampling,n_bands=0
     del dst # flush to save to disk
     
 def proximity_raster(src_filename,dst_filename):
+    ''' Calculate Euclidean distance to closest True cell for boolean src raster, write to disk.'''
     #source
     src_ds = gdal.Open(src_filename, gdalconst.GA_ReadOnly)
     src_proj = src_ds.GetProjection()

@@ -1,8 +1,8 @@
 import numpy as np
 import os
 from sklearn.base import BaseEstimator, RegressorMixin
-from functions.prediction import fit_huber, predict_huber
 import shutil
+import subprocess
 
 class LassoHuberRegressor(BaseEstimator,RegressorMixin):
 
@@ -26,21 +26,21 @@ class LassoHuberRegressor(BaseEstimator,RegressorMixin):
 
     def fit(self, X, y):
         # save data to file
-        np.savetxt(os.path.join(path,'X_train.csv'), X, delimiter=',') 
-        np.savetxt(os.path.join(path,'y_train.csv'), y, delimiter=',')
+        np.savetxt(os.path.join(self.disk_loc,'X_train.csv'), X, delimiter=',') 
+        np.savetxt(os.path.join(self.disk_loc,'y_train.csv'), y, delimiter=',')
     
         # fit huber regressor in R
         subprocess.call(f'rscript ./functions/fit_huber.r  {str(self.gamma)} {self.disk_loc}')
         
     def predict(self, X):
         # save data to file
-        np.savetxt(os.path.join(path,'X_pred.csv'), X, delimiter=',') 
+        np.savetxt(os.path.join(self.disk_loc,'X_pred.csv'), X, delimiter=',') 
 
         # predict with huber regression in R
         subprocess.call(f'rscript ./functions/predict_huber.r  {str(self.alpha)} {self.disk_loc}')
 
         # load predictions
-        y_pred = np.loadtxt(os.path.join(path,'y_pred.csv'), delimiter=',', skiprows=1)
+        y_pred = np.loadtxt(os.path.join(self.disk_loc,'y_pred.csv'), delimiter=',', skiprows=1)
         
         return y_pred
     

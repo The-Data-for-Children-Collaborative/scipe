@@ -1,0 +1,16 @@
+---
+# NOTE: Survey rasterization should be run from root of project, so define paths relative to there
+rois: [boa,mgd] # rois surveyed
+pop_rasters: # path to population raster for each roi
+    - ./data/pop/boa_pop.tif
+    - ./data/pop/mgd_pop.tif
+tile_dirs: # path to satellite imagery to use for building prediction for each roi
+    - ./maxar_boa/
+    - ./maxar_mgd/
+model_dirs: # paths to Keras building footprint segmentation models (directory should contain model.json and model.h5)
+    - ./spacenet/models/model_1_old/
+    - ./spacenet/models/model_1/
+    - ./spacesur/dataset_2/models/model_1/
+    - ./spacesur/dataset_2/models/model_2/
+context_sizes: [3,5] # size of contexts to consider when predicting footprints (width of square around each survey tile to predict over)
+...
