@@ -1,5 +1,5 @@
 ---
-# NOTE: Survey rasterization should be run from root of project, so define paths relative to there
+# NOTE: Footprint estimation should be run from root of project, so define paths relative to there
 rois: [boa,mgd] # rois surveyed
 pop_rasters: # path to population raster for each roi
     - ./data/pop/boa_pop.tif
