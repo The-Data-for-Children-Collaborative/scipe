@@ -10,9 +10,10 @@ There are several scripts included with the project. They are intended to be run
 Each script takes a separate YAML config file as input, examples of each can be found in [`/scripts/config/`](./scripts/config/).
 
 ## Examples
-Executing `run_pipeline.py` yields the following results for the example [`pipeline.yaml`](/scripts/config/pipeline.yaml):
+Executing `run_pipeline.py` yields the following results for the example [`pipeline.yaml`](/scripts/config/pipeline.yaml) with outliers removed:
 
-[Add some results]
+<img src="/experiments/swav/swav/outliers_removed/prediction_error.png" alt="Predicted vs. observed values"  height="400">
+<img src="/experiments/swav/swav/outliers_removed/rf_importance.png" alt="Predicted vs. observed values"  height="400">
 
 ## Data
 Data required to run the pipeline can be downloaded from [TBC].
