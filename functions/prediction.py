@@ -7,6 +7,7 @@ import subprocess
 import os
 from functions.scoring import meape, ameape, aggregate_percent_error
 from functions.visualization import *
+from functions.utilities import write_raster
 from tifffile import imread
 from tqdm import tqdm
 from copy import deepcopy
@@ -61,6 +62,9 @@ def cross_val(reg_master,df,features,target,return_models=True,log=False,huber=F
         return
     y_pred = []
     models = []
+    scaler = StandardScaler()
+    X = df[features].to_numpy()
+    scaler.fit(X)
     for i in ks:
         # start with fresh grid search instance 
         reg = deepcopy(reg_master)
@@ -79,8 +83,9 @@ def cross_val(reg_master,df,features,target,return_models=True,log=False,huber=F
             Y_val = np.log(Y_val)
         
         # initialize scaler, fit, and scale data
-        scaler = StandardScaler()
-        X_train = scaler.fit_transform(X_train)
+#         scaler = StandardScaler()
+#         X_train = scaler.fit_transform(X_train)
+        X_train = scaler.transform(X_train)
         X_val = scaler.transform(X_val)
         
         model = None
@@ -126,7 +131,7 @@ def get_rf(prng):
     return reg_rf
 
 def get_lasso():
-    lr = Lasso(max_iter=200)
+    lr = Lasso(max_iter=1000)
     reg_lr = GridSearchCV(lr,{'alpha':np.linspace(0.1,1,50)},scoring=make_scorer(median_absolute_error,greater_is_better=False),cv=3,n_jobs=-1) # np.linspace(0.1,1,50)
     return reg_lr
 
@@ -155,7 +160,18 @@ def get_model(model_name,prng):
         return get_dummy()
     else:
         print('Unidentified model, check pipeline config')
-        
+
+def run_experiment(df,features,cvs,logs,model_names,target='pop'):
+    models = []
+    for cv,log,name in zip(cvs,logs,model_names): # run experiment using each model
+        huber = cv == 'huber' # TODO: improve messy workaround for R package
+        print(f'\nTraining {name}\n')
+        y_pred,model =  cross_val(cv,df,features,target,log=log,return_models=True,huber=huber)
+        df[name] = y_pred
+        models.append(model)
+    return models
+    
+
 def run_experiments(df_master,cvs,model_names,logs,features_list,out_dir_list,experiment_dir,prng,plot_full=True,ignore_outliers_val=True,target='pop'):
     n_models = len(model_names) # number of models
     n_features = len(features_list) # number of feature sets to run each model on
@@ -173,26 +189,18 @@ def run_experiments(df_master,cvs,model_names,logs,features_list,out_dir_list,ex
             df = deepcopy(df_master)
             df = df[(df['outlier']==include_outliers)|(df['outlier']==False)]
             
-            models = []
-            
-            for cv,log,name in zip(cvs,logs,model_names): # run experiment for each model
-                huber = cv == 'huber' # TODO: improve messy workaround for R package
-                print(f'\nTraining {name}\n')
-                y_pred,model =  cross_val(cv,df,features,target,log=log,return_models=True,huber=huber)
-                df[name] = y_pred
-                models.append(model)
+            models = run_experiment(df,features,cvs,logs,model_names)
             
             if ignore_outliers_val:
                 df = df[df['outlier']==False] # validate without outliers
             
-            y_true = df[target].to_numpy(copy=True)
+            y_true = df[target].to_numpy(copy=True) # get true values
     
             # Plot error, importance, and update metrics
             plt.style.use('ggplot')
             f_error, axarr_error = plt.subplots(1,n_models,figsize=(3.5*n_models,3))
             if n_models == 1:
                 axarr_error = [axarr_error]
-            
             # update results for each model and plot feature importance
             for k,model in enumerate(model_names):
                 y_pred = df[model]
@@ -213,7 +221,8 @@ def run_experiments(df_master,cvs,model_names,logs,features_list,out_dir_list,ex
                         f,ax = feature_importance(models[k],features,cs,crop=False)
                         f.tight_layout(pad=1.2)
                         f.savefig(out_dir+f'{model}_importance_full.pdf',bbox_inches='tight')
-            f_error.savefig(out_dir+'prediction_error.pdf',bbox_inches='tight')     
+            f_error.savefig(out_dir+'prediction_error.pdf',bbox_inches='tight')
+            
     df_results = pd.DataFrame(results)
     #display(df_results)
     with open(os.path.join(experiment_dir,'table.tex'), 'w') as tf:
@@ -232,6 +241,66 @@ def run_predictions(df,params,prng):
         os.makedirs(experiment_dir)
     out_dir_list = [os.path.join(experiment_dir,os.path.basename(f)[0:-4]) for f in params['feature_sets']]
     run_experiments(df,cvs,model_names,logs,feature_sets,out_dir_list,experiment_dir,prng,plot_full=False)
+
+def to_raster(df,target,shape):
+    raster = np.zeros(shape)
+    for index,row in df.iterrows():
+        x,y,n = row['x'],row['y'],row[target]
+        raster[y,x] = n
+    return raster
+    
+def run_estimation(df,df_full,params,prng):
+    model_name = params['model']
+    cv = get_model(model_name,prng)
+    log = params['log']
+    rois = params['rois']
+    features = np.loadtxt(params['feature_set'],dtype=str)
+    prediction_dir = params['prediction_dir']
+    survey_paths = params['pop_rasters']
+    include_outliers = params['include_outliers']
+    hurdle_feature = ''
+    if 'hurdle_feature' in params:
+        hurdle_feature = params['hurdle_feature']
+    if not os.path.exists(prediction_dir):
+        os.makedirs(prediction_dir)
+        
+    df = df[(df['outlier']==include_outliers)|(df['outlier']==False)]
+        
+    print(f'Estimating population across {rois}')
+        
+    models = run_experiment(df,features,[cv],[log],[model_name])[0] # TODO: messy
+
+    scaler = StandardScaler() # TODO: do this in dataset building step?
+    X_sub = df[features].to_numpy() # use survey data to fit scaler
+    print('Fitting scaler... ',end='')
+    scaler.fit(X_sub)
+    print('done.')
+    print('Scaling dataset... ',end='')
+    X = scaler.transform(df_full[features].to_numpy())
+    print('done.')
+    
+    #X_batches = np.array_split(X,100)
+    df_full[model_name] = np.zeros(X.shape[0])
+    for model in models: # average result from model for each cv fold
+#         #y_pred = []
+#         for X_batch in tqdm(X_batches):
+#             y_pred.append(model.predict(X_batch))
+#         y_pred = np.array(y_pred).flatten()
+        y_pred = model.predict(X)
+        if log:
+            y_pred = np.exp(y_pred)
+        if hurdle_feature:
+            y_pred[np.where(df_full[hurdle_feature].to_numpy() < 2)] = 0
+        df_full[model_name] += y_pred
+    df_full[model_name] /= len(models)
+    print(df_full[model_name])
+    for roi,survey_path in zip(rois,survey_paths):
+        shape = imread(survey_path).shape
+        raster = to_raster(df_full.loc[df_full['roi'] == roi],model_name,shape)
+        #raster = np.expand_dims(raster,axis=-1)
+        write_raster(raster,survey_path,os.path.join(prediction_dir,f'pop_pred_{roi}.tif'))
+    
+        
     
     
     

@@ -6,6 +6,8 @@ import os
 
 def write_raster(arr,file_match,file_out,dtype=gdal.GDT_Float32):
     ''' Write arr as geoTiff file_out with georeferencing of file_match '''
+    if arr.ndim == 2:
+        arr = np.expand_dims(arr,axis=-1) # grayscale image
     # load match dataset
     ds_in = gdal.Open(file_match)
     cols, rows = arr.shape[0:2]
@@ -32,8 +34,8 @@ def project_raster(src_filename,match_filename,dst_filename,resampling,n_bands=0
     
     if n_bands < 1:
         n_bands = src_ds.RasterCount
-        if n_bands > 10:
-            n_bands = 10 # bug with GDAL, can only use first 10 bands
+    if n_bands > 10:
+        n_bands = 10 # bug with GDAL, can only use first 10 bands
         
     #output/destination
     

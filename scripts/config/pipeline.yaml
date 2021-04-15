@@ -41,13 +41,17 @@ dataset:
         - ./outliers/boa_outliers_new.csv
         - ./outliers/mgd_outliers_new.csv
     context_sizes: [3,5] # size of feature contexts to consider when building dataset
+    zero_label_paths: [] # optional: paths to zero labels in addition to the survey
+#         - ./data/pop/boa_zero.pkl
+#         - ./data/pop/mgd_zero.pkl
     
 # Embedding parameters
 embedding:
     run: True # whether to embed survey tiles
-    models: # choose from [swav,tile2vec,resentv2,inceptionv3,vgg16,xception,densenet]
+    models: # choose from [swav,swav_pretrained,tile2vec,resentv2,inceptionv3,vgg16,xception,densenet]
 #         - tile2vec
-        - swav
+#         - swav
+        - swav_pretrained
 #         - inception
 #         - resnet
 #         - densenet
@@ -57,19 +61,36 @@ embedding:
     
 # Population prediction parameters
 prediction:
+    run: True
     feature_sets: # sets of features to run experiments with (csv file holding dataframe column names)
 #         - ./scripts/config/features/public.csv
 #         - ./scripts/config/features/spacesur_only.csv
 #         - ./scripts/config/features/public_spacesur.csv
-        - ./scripts/config/features/swav.csv
+#         - ./scripts/config/features/swav.csv
+        - ./scripts/config/features/swav_pretrained.csv
 #         - ./scripts/config/features/tile2vec.csv
 #         - ./scripts/config/features/inception.csv
 #         - ./scripts/config/features/resnet.csv
 #         - ./scripts/config/features/densenet.csv
 #         - ./scripts/config/features/vgg16.csv
-    experiment_dir: ./experiments/swav/ # where to output experiment results
+    experiment_dir: ./predictions/swav_lasso_no_outlier/ # where to output experiment results
     models: # models to run experiments with, choose from [lasso, rf, poisson, huber, dummy]
-        - rf
+        - lasso
     log: # whether to predict log of population for each model
         - False
+
+# Population estimation (i.e. over entire roi) parameters
+estimation:
+    run: True # whether or not to run estimation
+    rois: [boa] # rois to estimate over
+    pop_rasters: # population count raster for each roi, used to match grid for estimates
+        - ./data/pop/boa_pop.tif
+    model: lasso
+    log: False
+    include_outliers: False # whether to include survey outliers when training
+    embed: True
+#     feature_set: ./scripts/config/features/spacesur_only.csv         
+    feature_set: ./scripts/config/features/swav_pretrained.csv
+    prediction_dir: ./predictions/swav_lasso_no_outlier/
+#     hurdle_feature: building_area_ss2_2 # if specified feature is zero, set population to zero
 ...

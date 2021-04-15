@@ -31,6 +31,17 @@ def plot_tiles(embds,tiles,pops=[],pop_range=(0,1),zoom=0.1,figsize=(20,20)):
         ax.add_artist(ab)
     return f,ax
 
+def interpolate_feature(model,tiles_master,preprocessing,dim,n=5):
+    ''' Return n indices that interpolate through tiles in specified dimension of embedding '''
+    y_pred = []
+    tiles = np.array([preprocessing(tile) for tile in tiles_master])
+    y_pred = np.array([embed_tile_torch(tile,model) for tile in tqdm(tiles,position=0,leave=True)])
+    print(y_pred.shape)
+    y_pred = y_pred[:,dim]
+    print(y_pred.shape)
+    idxs = np.argsort(y_pred)[::-1] # descending order to ensure largest value of dim is returned
+    return [idxs[i] for i in range(0,idxs.shape[0]-1,idxs.shape[0]//n)][::-1] # reverse back to give ascending order
+
 def visualize_embeddings(model,tiles_master,preprocessing,torch_model=True,zoom=0.1):
     ''' Visualize model embeddings of tiles using T-SNE '''
     y_pred = []

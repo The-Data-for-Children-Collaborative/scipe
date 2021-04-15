@@ -3,6 +3,8 @@ import pandas as pd
 import csv
 import os
 import json
+import pickle
+from tqdm import tqdm
 from tifffile import imread
 from copy import deepcopy
 from osgeo import gdal
@@ -88,13 +90,14 @@ def mark_outliers_new(df,outliers,col=2):
                 df.loc[(df['x'] == x) & (df['y'] == y),'outlier'] = True
     return df
 
-def build_dataset(params): # construct dataframe from rasters, survey
+def build_dataset(params,survey_only=True):
     '''
     Build dataset of features with context, population labels according to 
     specifications in file params_path.
     
             Args:
                     params (dict): A dictionary holding parameters.
+                    survey_only (bool): True if build dataset for only sampled survey tiles
 
             Returns:
                     df (DataFrame): Pandas DataFrame containing full dataset.
@@ -105,16 +108,22 @@ def build_dataset(params): # construct dataframe from rasters, survey
     pop_rasters = params['pop_rasters']
     outliers_paths = params['outliers_paths']
     context_sizes = params['context_sizes']
+    zero_labels = params['zero_label_paths']
+    if not zero_labels:
+        zero_labels = ['' for roi in rois]
     
     # construct dataset
     dfs = []
-    for roi,pop,outliers_path in zip(rois,pop_rasters,outliers_paths):
+    for roi,pop,outliers_path,zero_labels_path in zip(rois,pop_rasters,outliers_paths,zero_labels):
         raster_dir = os.path.join(in_dir,roi)
         files = os.listdir(raster_dir)
         rasters = [imread(os.path.join(raster_dir,f)) for f in files if f.endswith('.tif')]
         feature_names = [os.path.splitext(f)[0] for f in files if f.endswith('.tif')]
         pop = imread(pop)
-        
+        zero_set = set()
+        if zero_labels_path: # skip if no zero label path provided for this roi
+            with open(zero_labels_path,'rb') as file:
+                zero_set = pickle.load(file)
         d = {'x':[],'y':[]} # coordinates used to perform validation split spatially
         for f in feature_names:
             d[f] = []
@@ -122,31 +131,37 @@ def build_dataset(params): # construct dataframe from rasters, survey
             for f in feature_names:
                 d[f'{f}_context_{size}x{size}'] = []
         d['pop'] = []
-        df = pd.DataFrame(d)
-        count = 0
-        for i in range(pop.shape[0]):
-            for j in range(pop.shape[1]):
-                n = pop[i,j] # population of cell
-                if n > 0:
+        print(f'Building dataset for {roi}')
+        for y in tqdm(range(pop.shape[0])): # TODO: make fast
+            for x in range(pop.shape[1]):
+                in_zero = (y,x) in zero_set
+                n = pop[y,x] # population of cell
+                if in_zero:
+                    n = 0.01 # TODO: probably remove this
+                if n > 0 or in_zero or not survey_only:
                     # populate row with raster values at cell
-                    row = np.array([j,i])
-                    for r in rasters:
-                        row = np.append(row,r[i,j])
+                    d['y'].append(y)
+                    d['x'].append(x)
+                    for r,f in zip(rasters,feature_names):
+                        d[f].append(r[y,x])
                     for size in context_sizes:
-                        for r in rasters:
-                            row = np.append(row,get_context(r,i,j,size))
+                        for r,f in zip(rasters,feature_names):
+                            d[f'{f}_context_{size}x{size}'].append(get_context(r,y,x,size))
                             #print(row.shape[0])
-                    row = np.append(row,n)
-                    #print(row.shape)
-                    df.loc[count] = row
-                    count+=1
+                    d['pop'].append(n)
+        df = pd.DataFrame(d)
         df['x'] = df['x'].astype(int)
         df['y'] = df['y'].astype(int)
         df['roi'] = roi
-        df = label_folds(get_val_split(df))
-        df = mark_outliers_new(df,outliers_path)
+        if survey_only: # cross_val folds only relevant for survey data
+            df = label_folds(get_val_split(df))
+            df = mark_outliers_new(df,outliers_path)
+        else: # population irrelevant for non-survey data
+            df = df.drop(labels='pop', axis=1)   
         dfs.append(df)
     df = dfs[0]
     for df_i in dfs[1:]: # combine dataframes for each roi
         df = df.append(df_i,ignore_index=True)
-    return df.sort_values(by='fold', ascending=True).reset_index(drop=True) # sort by fold
+    if survey_only:
+        df = df.sort_values(by='fold', ascending=True)
+    return df.reset_index(drop=True) # sort by fold

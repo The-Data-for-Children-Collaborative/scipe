@@ -1,6 +1,7 @@
 from osgeo import gdal, gdalconst
 from tifffile import imread, imsave
 from shutil import copyfile
+from tqdm import tqdm
 import numpy as np
 import json
 import os
@@ -15,7 +16,7 @@ lcc_class_values = {'0': 0, '111': 1, '112': 1, '113': 1, '114': 1, '115': 1, '1
 lcc_class_names = {0:'no_data',1:'closed_forest',2:'open_forest',3:'shrubs',4:'hb_veg',5:'hb_waste',
                   6:'moss',7:'sparse',8:'cropland',9:'urban',10:'snow',11:'water',12:'sea'}
 
-from functions.utilities import project_raster, proximity_raster
+from functions.utilities import project_raster, proximity_raster, write_raster
 
 resamplers_table = {'average': gdalconst.GRA_Average, 'nearest': gdalconst.GRA_NearestNeighbour, 'max': gdalconst.GRA_Max}
 
@@ -165,7 +166,7 @@ def process_footprints(footprint_dirs,model_names,thresholds,pop_rasters,rois,ou
             shape = imread(pop_raster).shape
             area_raster = np.zeros(shape)
             roi_dir = os.path.join(footprint_dir,roi)
-            for file in os.listdir(roi_dir):
+            for file in tqdm(os.listdir(roi_dir)):
                 if file.endswith('.tif'):
                     buildings = imread(os.path.join(roi_dir,file))
                     buildings = np.where(buildings > threshold,0.25,0) # each pixel occupies 0.25 m^2
@@ -173,7 +174,7 @@ def process_footprints(footprint_dirs,model_names,thresholds,pop_rasters,rois,ou
                     y,x = int(y),int(x)
                     building_area = np.sum(buildings) 
                     area_raster[y,x] = building_area
-            imsave(os.path.join(out_dir,roi,f'building_area_{model_name}.tif'),area_raster)
+            write_raster(area_raster,pop_raster,os.path.join(out_dir,roi,f'building_area_{model_name}.tif'))
 
 def preprocess_data(params):
     '''
