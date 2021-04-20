@@ -106,7 +106,6 @@ def get_swav(pretrained=True):
         model.fc = torch.nn.Identity() # remove fully connected portion of model
         model.cuda()
         model.eval()
-        # model, preprocessing, is torch model (True) or keras model (False)
         return(model,preprocess_imagenet)
     else:
         model = resnet_models.__dict__['resnet50'](
@@ -138,7 +137,6 @@ def get_tile2vec():
     model.load_state_dict(torch.load(tile2vec_path))
     model.cuda()
     model.eval()
-    # model, preprocessing, is torch model (True) or keras model (False)
     return(model,preprocess_tilenet)
 
 def get_inception():
@@ -156,7 +154,7 @@ def get_densenet():
     return(model,preprocess_imagenet)
 
 def get_resnet():
-    model = torchvision.models.resnet101(pretrained=True)
+    model = torchvision.models.resnet50(pretrained=True)
     model.fc = torch.nn.Identity() # remove fully connected portion of model
     model.cuda()
     model.eval()
