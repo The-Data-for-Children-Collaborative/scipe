@@ -108,8 +108,9 @@ def build_dataset(params,survey_only=True):
     pop_rasters = params['pop_rasters']
     outliers_paths = params['outliers_paths']
     context_sizes = params['context_sizes']
-    zero_labels = params['zero_label_paths']
-    if not zero_labels:
+    if 'zero_label_paths' in params:
+        zero_labels = params['zero_label_paths']
+    else:
         zero_labels = ['' for roi in rois]
     
     # construct dataset
@@ -154,7 +155,12 @@ def build_dataset(params,survey_only=True):
         df['y'] = df['y'].astype(int)
         df['roi'] = roi
         if survey_only: # cross_val folds only relevant for survey data
-            df = label_folds(get_val_split(df))
+            if len(zero_set) > 0: # if zero labels have been specified
+                df_survey = label_folds(get_val_split(df[df['pop'] >= 1]))
+                df_zero  = label_folds(get_val_split(df[df['pop'] < 1]))
+                df = df_survey.append(df_zero,ignore_index=True)
+            else:
+                df = label_folds(get_val_split(df))
             df = mark_outliers_new(df,outliers_path)
         else: # population irrelevant for non-survey data
             df = df.drop(labels='pop', axis=1)   
@@ -164,4 +170,4 @@ def build_dataset(params,survey_only=True):
         df = df.append(df_i,ignore_index=True)
     if survey_only:
         df = df.sort_values(by='fold', ascending=True)
-    return df.reset_index(drop=True) # sort by fold
+    return df.reset_index(drop=True)

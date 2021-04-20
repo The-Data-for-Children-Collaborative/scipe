@@ -18,6 +18,7 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import ConstantKernel, RBF
 from sklearn.metrics import r2_score, median_absolute_error, make_scorer
 from sklearn.model_selection import GridSearchCV
+from sklearn.inspection import plot_partial_dependence
 from sklearn.dummy import DummyRegressor
 sys.path.insert(0, os.path.abspath('.'))
 
@@ -172,7 +173,7 @@ def run_experiment(df,features,cvs,logs,model_names,target='pop'):
     return models
     
 
-def run_experiments(df_master,cvs,model_names,logs,features_list,out_dir_list,experiment_dir,prng,plot_full=True,ignore_outliers_val=True,target='pop'):
+def run_experiments(df_master,cvs,model_names,logs,features_list,out_dir_list,experiment_dir,prng,plot_full=True,ignore_outliers_val=True,ignore_zeros_val=True,target='pop'):
     n_models = len(model_names) # number of models
     n_features = len(features_list) # number of feature sets to run each model on
     n_metrics = 5 # number of metrics to report in results table
@@ -193,6 +194,8 @@ def run_experiments(df_master,cvs,model_names,logs,features_list,out_dir_list,ex
             
             if ignore_outliers_val:
                 df = df[df['outlier']==False] # validate without outliers
+            if ignore_zeros_val:
+                df = df[df[target] >= 1] # validate without artificial zero examples
             
             y_true = df[target].to_numpy(copy=True) # get true values
     
@@ -207,10 +210,11 @@ def run_experiments(df_master,cvs,model_names,logs,features_list,out_dir_list,ex
                 results_row = get_metrics(y_true,df[model])
                 results[k*n_features+i, j*n_metrics:(j+1)*n_metrics] = results_row
                 # plot error
-                print('\nPlotting prediction error\n')
+                print('Plotting prediction error\n')
                 prediction_error(df,true='pop',pred=model,ax=axarr_error[k],color=True) # plot
                 #axarr_error[k].set_title(model)
-                print('\nPlotting feature importance\n')
+                
+                print('Plotting feature importance\n')
                 if model!='huber': # TODO: improve messy workaround for R package
                     # plot importance
                     cs = get_colors(features.shape[0])
@@ -221,6 +225,14 @@ def run_experiments(df_master,cvs,model_names,logs,features_list,out_dir_list,ex
                         f,ax = feature_importance(models[k],features,cs,crop=False)
                         f.tight_layout(pad=1.2)
                         f.savefig(out_dir+f'{model}_importance_full.pdf',bbox_inches='tight')
+                        
+                    # TODO: improve partial dependence
+                    f, ax = plt.subplots(figsize=(14,10))
+                    scaler = StandardScaler()
+                    X = df[features].to_numpy()
+                    X = scaler.fit_transform(X)
+                    plot_partial_dependence(models[k][0],X,features=[0,1,2,(0,1),(0,2)],feature_names=features,ax=ax,contour_kw={'cmap':'viridis'})
+                    f.savefig(out_dir+f'{model}_pd.pdf',bbox_inches='tight')
             f_error.savefig(out_dir+'prediction_error.pdf',bbox_inches='tight')
             
     df_results = pd.DataFrame(results)
@@ -272,20 +284,11 @@ def run_estimation(df,df_full,params,prng):
 
     scaler = StandardScaler() # TODO: do this in dataset building step?
     X_sub = df[features].to_numpy() # use survey data to fit scaler
-    print('Fitting scaler... ',end='')
     scaler.fit(X_sub)
-    print('done.')
-    print('Scaling dataset... ',end='')
     X = scaler.transform(df_full[features].to_numpy())
-    print('done.')
     
-    #X_batches = np.array_split(X,100)
     df_full[model_name] = np.zeros(X.shape[0])
     for model in models: # average result from model for each cv fold
-#         #y_pred = []
-#         for X_batch in tqdm(X_batches):
-#             y_pred.append(model.predict(X_batch))
-#         y_pred = np.array(y_pred).flatten()
         y_pred = model.predict(X)
         if log:
             y_pred = np.exp(y_pred)
