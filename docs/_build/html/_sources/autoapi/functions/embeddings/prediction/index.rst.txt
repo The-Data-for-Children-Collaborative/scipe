@@ -14,11 +14,6 @@
 Module Contents
 ---------------
 
-.. function:: preprocess_imagenet(tile)
-
-   Return tile preprocess for imagenet model.
-
-
 .. function:: embed_tile_torch(tile, model)
 
    Embed prepared tile using torch model.

@@ -17,6 +17,16 @@ Module Contents
    Return grid search instance for Poisson regression model.
 
 
+.. function:: get_lasso()
+
+   Return grid search instance for lasso regression model.
+
+
+.. function:: get_dummy()
+
+   Return grid search instance for dummy regression model (returns mean of training set).
+
+
 .. function:: get_rf(prng)
 
    Get grid search instance for Random Forest regression model.
@@ -26,16 +36,6 @@ Module Contents
 
    :returns: Random Forest grid search instance.
    :rtype: sklearn.model_selection.GridSearchCV
-
-
-.. function:: get_lasso()
-
-   Return grid search instance for lasso regression model.
-
-
-.. function:: get_dummy()
-
-   Return grid search instance for dummy regression model (returns mean of training set).
 
 
 .. function:: get_model(model_name, prng)

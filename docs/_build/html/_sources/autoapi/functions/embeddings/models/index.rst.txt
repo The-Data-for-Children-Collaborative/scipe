@@ -67,3 +67,8 @@ Module Contents
    Lookup model by name.
 
 
+.. function:: preprocess_imagenet(tile)
+
+   Return tile preprocess for imagenet model.
+
+
