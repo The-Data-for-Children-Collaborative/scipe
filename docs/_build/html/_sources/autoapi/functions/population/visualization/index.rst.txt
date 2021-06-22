@@ -1,0 +1,65 @@
+:mod:`functions.population.visualization`
+=========================================
+
+.. py:module:: functions.population.visualization
+
+.. autoapi-nested-parse::
+
+   Module for visualization of data and results related to population estimation.
+
+
+
+Module Contents
+---------------
+
+.. function:: plot_folds(df, figsize=(4.5, 9), bbox=(1.75, 1))
+
+   Return spatial plot of validation folds.
+
+
+.. function:: get_tiles(x, y, roi, tiles_path)
+
+   Return (img,buildings) pair of numpy arrays for roi survey tile (y,x).
+
+
+.. function:: get_tiles_df(df, i, tiles_path)
+
+   Return (img,buildings) pair of numpy arrays for dataframe row i.
+
+
+.. function:: prediction_error(df, true='pop', pred='pop_pred', var=None, ax=None, images=False, buildings=False, tiles_path=None, color=True, show_metrics=False, lim=None)
+
+   Plot predicted (df[pred]) vs observed (df[true]) values from dataframe, optionally plot error bars (var =
+   True) and tile images/buildings over points.
+
+
+.. function:: to_img(buildings, threshold=0.5)
+
+   Visdualize building footprint estimates as image with transparent background where buildings <= threshold.
+
+
+.. function:: merge(image, buildings, threshold=0.5)
+
+   Overlay building estimates (where > threshold) over image of tile.
+
+
+.. function:: display_pair(img, buildings, axarr=None, points=None)
+
+   Plot three images: img, buildings, and buildings overlayed on img.
+
+
+.. function:: to_pdf(survey, roi, tiles_path, out_path, points=None, coords=None, outliers=None)
+
+   Output pdf displaying population labeled survey tiles.
+
+
+.. function:: get_colors(n, offset=0.7)
+
+   Get colormap for n features.
+
+
+.. function:: feature_importance(models, features, colors, crop=True, n_show=10)
+
+   Plot feature importance for model as bar chart.
+
+

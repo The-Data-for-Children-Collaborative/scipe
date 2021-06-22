@@ -1,0 +1,83 @@
+:mod:`functions.population.data`
+================================
+
+.. py:module:: functions.population.data
+
+.. autoapi-nested-parse::
+
+   Module containing functions for building population datasets.
+
+
+
+Module Contents
+---------------
+
+.. function:: in_bounds(raster, y, x)
+
+   Check if array access at index (y,x) is in bounds of raster.
+
+
+.. function:: get_context(raster, y, x, n)
+
+   Return mean of n x n context area surrounding index (y,x) of raster.
+
+
+.. function:: get_val_split(df, n=2, coord='y', leaf=False)
+
+   Returns list of (n x n) pandas dataframes, corresponding to splitting df spatially into (n x n)
+   segments with approx equal numbers of survey points by:
+       1. splitting into n segments by y coordinate, then
+       2. splitting each segment into n segments by x coordinate.
+
+
+.. function:: label_folds(dfs)
+
+   Returns concatenatenation of dataframes in list dfs, each labelled with a unique value in the 'fold' column.
+
+
+.. function:: mark_outliers(df, outliers, col=2)
+
+   Mark members of df with outlier values defined in csv file.
+
+
+.. function:: init_cols(feature_names, context_sizes)
+
+   Initialize dictionary with column names.
+
+
+.. function:: build_row(d, y, x, pop, rasters, feature_names, context_sizes)
+
+   Build row (in-place) of population dataset corresponding to grid cell .
+
+   :param d: Dictionary used to build dataset.
+   :type d: dict
+   :param y: y coord of grid cell covered by row.
+   :type y: int
+   :param x: x coord of grid cell covered by row.
+   :type x: int
+   :param pop: population of grid cell (where known).
+   :type pop: int
+   :param rasters: rasters containing features.
+   :type rasters: :obj:`list` of :obj:`np.ndarray`
+   :param feature_names: name for each raster in rasters.
+   :type feature_names: :obj:`list` of :obj:`np.ndarray`
+   :param context_sizes: sizes of n x n feature contexts to compute.
+   :type context_sizes: :obj:`list` of :obj:`int`
+
+   :returns: None.
+
+
+.. function:: build_dataset(params, survey_only=True)
+
+   Build dataset of features with context, population labels according to
+   specifications in file params_path.
+
+   :param params: A dictionary holding parameters.
+   :type params: dict
+   :param survey_only: True if building dataset for only sampled survey tiles.
+   :type survey_only: bool
+
+   :returns: Pandas DataFrame containing full dataset.
+   :rtype: pd.DataFrame
+
+

@@ -1,0 +1,46 @@
+:mod:`functions.embeddings.prediction`
+======================================
+
+.. py:module:: functions.embeddings.prediction
+
+.. autoapi-nested-parse::
+
+   Module for embedding remote sensing tiles.
+
+   .. todo:: * Speed up embedding by performing in batches.
+
+
+
+Module Contents
+---------------
+
+.. function:: preprocess_imagenet(tile)
+
+   Return tile preprocess for imagenet model.
+
+
+.. function:: embed_tile_torch(tile, model)
+
+   Embed prepared tile using torch model.
+
+
+.. function:: embed_survey_tiles(df, model, model_name, preprocess_input)
+
+   Embed survey tiles in df using torch model.
+
+
+.. function:: run_embeddings(df, params, rm_zero)
+
+   Run and save embeddings to df. Optionally append precomputed embeddings from disk.
+
+   :param df: Dataframe to run embeddings over.
+   :type df: pd.DataFrame
+   :param params: Parameters for embeddings, including models to run etc.
+   :type params: dict
+   :param rm_zero: Whether to remove zero population tiles from dataset when merging precomputed results.
+   :type rm_zero: bool
+
+   :returns: Dataframe with tile embeddings for each row and model.
+   :rtype: pd.DataFrame
+
+

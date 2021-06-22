@@ -1,0 +1,17 @@
+:mod:`scripts`
+==============
+
+.. py:module:: scripts
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   estimate_footprints/index.rst
+   rasterize_survey/index.rst
+   run_pipeline/index.rst
+
+

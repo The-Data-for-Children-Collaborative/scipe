@@ -1,3 +1,7 @@
 *.ipynb
 *.pyc
 *-checkpoint.py
+*.tif
+*.pdf
+*.png
+*.svg

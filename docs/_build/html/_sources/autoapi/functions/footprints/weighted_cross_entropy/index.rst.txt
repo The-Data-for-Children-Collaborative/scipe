@@ -1,0 +1,14 @@
+:mod:`functions.footprints.weighted_cross_entropy`
+==================================================
+
+.. py:module:: functions.footprints.weighted_cross_entropy
+
+
+Module Contents
+---------------
+
+.. function:: weighted_cross_entropy(beta)
+
+   Weighted cross entropy loss function with weighting beta
+
+

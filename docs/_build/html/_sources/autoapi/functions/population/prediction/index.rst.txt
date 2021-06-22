@@ -1,0 +1,123 @@
+:mod:`functions.population.prediction`
+======================================
+
+.. py:module:: functions.population.prediction
+
+.. autoapi-nested-parse::
+
+   Module for training population models and predicting population.
+
+
+
+Module Contents
+---------------
+
+.. function:: pop_histogram(y, ax, y_label)
+
+   Plot histogram of population
+
+
+.. function:: get_split(df, k, verbose=True)
+
+   Return training/validation split for fold k in df
+
+
+.. function:: get_metrics(y_true, y_pred)
+
+   return metrics computed on observed and predicted values formatted for table
+
+
+.. function:: cross_val(reg_master, df, features, target, return_models=True, log=False)
+
+   Train regression model using cross-validation on dataframe pre-split into folds.
+
+   :param reg_master: A grid search instance to be trained.
+   :type reg_master: sklearn.model_selection.GridSearchCV
+   :param df: The dataframe used for training and validation.
+   :type df: pd.DataFrame
+   :param features: The dataframe columns used as features during training.
+   :type features: :obj:`list` of :obj:`str`
+   :param target: The dataframe column used as target variable during training.
+   :type target: str
+   :param return_models: Whether to return models. Defaults to False.
+   :type return_models: :obj:`bool`, optional
+   :param log: Whether to predict predict log of target. Defaults to False.
+   :type log: :obj:`bool`, optional
+
+   :returns: Model predictions for each row of the
+             dataframe, model variance for each row of the dataframe, and list of model trained on each cross validation fold
+             returned if return_models is True.
+   :rtype: (:obj:`np.ndarray`, :obj:`np.ndarray`, :obj:`list` of :obj:`model`)
+
+
+.. function:: run_experiment(df, features, cvs, logs, model_names, target='pop')
+
+   Run experiment by training given models with specified feature set. Results are saved to dataframe.
+
+   :param df: The dataframe used for training and validation.
+   :type df: pd.DataFrame
+   :param features: The dataframe columns used as features during training.
+   :type features: :obj:`list` of :obj:`str`
+   :param cvs: Grid search instance for each model.
+   :type cvs: :obj:`list` of :obj:`sklearn.model_selection.GridSearchCV`
+   :param logs: Whether to predict predict log of target for each model.
+   :type logs: :obj:`list` of :obj:`bool`
+   :param model_names: Name of each model.
+   :type model_names: :obj:`list` of :obj:`str`
+   :param target: The dataframe column used as target variable during training. Defaults to 'pop'.
+   :type target: :obj:`str`, optional
+
+   :returns: List of models trained on df via cross validation.
+   :rtype: :obj:`list` of :obj:`sklearn.base.BaseEstimator`
+
+
+.. function:: plot_model(model, ax, df, features, model_name, out_dir, plot_full)
+
+   Plot prediction error and feature importance for model.
+
+
+.. function:: run_experiments(df_master, cvs, model_names, logs, features_list, out_dir_list, experiment_dir, plot_full=True, ignore_outliers_val=True, ignore_zeros_val=True, target='pop')
+
+   :param df_master: The dataframe used to run the experiments.
+   :type df_master: :obj:`pd.DataFrame`
+   :param cvs: Grid search instance for each model.
+   :type cvs: :obj:`list` of :obj:`sklearn.model_selection.GridSearchCV`
+   :param model_names: Name of each model.
+   :type model_names: :obj:`list` of :obj:`str`
+   :param logs: Whether to predict predict log of target for each model.
+   :type logs: :obj:`list` of :obj:`bool`
+   :param features_list: Dataframe columns to use as features in each experiment.
+   :type features_list: :obj:`list` of :obj:`str`
+   :param out_dir_list: Directories to output results of each experiment.
+   :type out_dir_list: :obj:`list` of :obj:`str`
+   :param experiment_dir: Parent directory for experiment directories.
+   :param plot_full: Whether or not to plot feature importance with full feature set.
+                     Avoid for large feature sets. Defaults to True.
+   :type plot_full: :obj:`bool`, optional
+   :param ignore_outliers_val: Whether to always ignore outlier tiles during validation.
+                               Defaults to True.
+   :type ignore_outliers_val: :obj:`bool`, optional
+   :param ignore_zeros_val: Whether to always ignore zero population tiles during validation.
+                            Defaults to True.
+   :type ignore_zeros_val: :obj:`bool`, optional
+   :param target: The dataframe column used as target variable during training. Defaults to 'pop'.
+   :type target: :obj:`str`, optional
+
+   :returns: None.
+
+
+.. function:: run_predictions(df, params, prng)
+
+   Run experiments described in params over dataset df.
+
+
+.. function:: to_raster(df, target, shape)
+
+   Convert df[target] to raster of specified shape.
+
+
+.. function:: run_estimation(df, df_full, params, prng)
+
+   Run estimation across full roi(s) based on params.
+
+

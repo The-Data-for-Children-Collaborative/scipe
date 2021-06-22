@@ -1,0 +1,44 @@
+:mod:`functions.population.survey`
+==================================
+
+.. py:module:: functions.population.survey
+
+.. autoapi-nested-parse::
+
+   Module for rasterizing survey data. NOTE: this is dependent on survey details, so must be modified for each survey format.
+
+
+
+Module Contents
+---------------
+
+.. function:: get_extent(df)
+
+   Return extent of survey cells contained within df.
+
+
+.. function:: get_arr(df, extent, feature, verbose=False)
+
+   Return numpy array of target feature from survey dataframe.
+
+
+.. function:: arr_to_raster(out_file, origin, pixel_width, pixel_height, srs, array)
+
+   Save survey array to raster.
+
+
+.. function:: df_to_raster(df, filename, srs_path, feature)
+
+   Rasterize survey and save to disk.
+
+
+.. function:: display_surveys(dfs)
+
+   Plot survey rasters.
+
+
+.. function:: rasterize_survey(params)
+
+   Process population survey for each roi according to params.
+
+

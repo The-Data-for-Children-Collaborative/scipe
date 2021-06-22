@@ -1,0 +1,14 @@
+:mod:`scripts.estimate_footprints`
+==================================
+
+.. py:module:: scripts.estimate_footprints
+
+
+Module Contents
+---------------
+
+.. data:: params
+   
+
+   
+

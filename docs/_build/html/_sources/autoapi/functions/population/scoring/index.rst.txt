@@ -1,0 +1,39 @@
+:mod:`functions.population.scoring`
+===================================
+
+.. py:module:: functions.population.scoring
+
+.. autoapi-nested-parse::
+
+   Module containing scoring functions for population models.
+
+
+
+Module Contents
+---------------
+
+.. function:: to_categorical(ys, bands)
+
+   Categorize data based on provided list of tuples dictating bands
+
+
+.. function:: accuracy(y_true, y_pred, bands)
+
+   Categorize data then then return accuracy
+
+
+.. function:: meape(y_true, y_pred)
+
+   Calculate median absolute percentage error
+
+
+.. function:: ameape(y_true, y_pred, k=10)
+
+   Calculate adjusted median absolute percentage error
+
+
+.. function:: aggregate_percent_error(y_true, y_pred)
+
+   Calculate aggregate percentage error
+
+

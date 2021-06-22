@@ -1,0 +1,24 @@
+:mod:`scripts.run_pipeline`
+===========================
+
+.. py:module:: scripts.run_pipeline
+
+
+Module Contents
+---------------
+
+.. data:: SEED
+   :annotation: = 42
+
+   
+
+.. data:: prng
+   
+
+   
+
+.. data:: params
+   
+
+   
+

@@ -1,0 +1,20 @@
+:mod:`functions.footprints`
+===========================
+
+.. py:module:: functions.footprints
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   dice/index.rst
+   generator/index.rst
+   models/index.rst
+   prediction/index.rst
+   training/index.rst
+   weighted_cross_entropy/index.rst
+
+

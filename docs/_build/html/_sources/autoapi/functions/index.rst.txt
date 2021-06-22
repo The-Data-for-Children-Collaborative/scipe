@@ -1,0 +1,17 @@
+:mod:`functions`
+================
+
+.. py:module:: functions
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   embeddings/index.rst
+   footprints/index.rst
+   population/index.rst
+
+

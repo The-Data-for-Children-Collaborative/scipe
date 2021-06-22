@@ -1,0 +1,86 @@
+:mod:`functions.footprints.prediction`
+======================================
+
+.. py:module:: functions.footprints.prediction
+
+
+Module Contents
+---------------
+
+.. function:: load_model(model_path, weights_path)
+
+   Load Keras model and weights from disk.
+
+
+.. function:: load_models(model_paths)
+
+   Load list of Keras models and weights from disk.
+
+
+.. function:: learn_distribution(path, count)
+
+   Learn distribution of imagery by sampling subset.
+
+
+.. function:: predict_sample(img, mean, std, model)
+
+   Standardize image with featurewise mean and standard deviation then make prediction with model.
+
+   :param img: Input image to model.
+   :type img: :obj:`np.ndarray`
+   :param mean: The feature-wise mean used to center img.
+   :type mean: :obj:`np.ndarray`
+   :param std: The feature-wise standard deviation used to scale img.
+   :type std: :obj:`np.ndarray`
+   :param model: Keras model used for predictions.
+   :type model: :obj:`tf.keras.Model`
+
+   :returns: Model prediction.
+   :rtype: :obj:`np.ndarray`
+
+
+.. function:: estimate_footprints(roi, survey, img_dir, model_dirs, context_sizes, n_samples=1000)
+
+   Estimate footprints using specified models for roi across survey tiles and surrounding context area, and save to disk.
+
+   :param roi: The roi to predict over, used for writing to disk.
+   :type roi: str
+   :param survey: The survey whose tiles to predict on.
+   :type survey: :obj:`np.ndarray`
+   :param img_dir: The path to the directory containing tiles.
+   :type img_dir: str
+   :param model_dirs: The list of paths to models used for prediction.
+   :type model_dirs: :obj:`list` of :obj:`str`
+   :param context_sizes: The list of context sizes to predict on around survey tiles.
+   :type context_sizes: :obj:`list` of :obj:`int`
+   :param n_samples: The number of samples to use to sample featurewise mean and standard deviation.
+   :type n_samples: :obj:`int`, optional
+
+   :returns: None.
+
+
+.. function:: estimate_footprints_full(roi, survey, img_dir, model_dirs, context_sizes, n_samples=1000)
+
+   Estimate footprints for entire roi using specified model, and save to disk.
+
+   :param roi: The roi to predict over, used for writing to disk.
+   :type roi: str
+   :param survey: The survey whose bounds to predict over.
+   :type survey: :obj:`np.ndarray`
+   :param img_dir: The path to the directory containing tiles.
+   :type img_dir: str
+   :param model_dirs: Path to the model used for prediction.
+   :type model_dirs: str
+   :param context_sizes: The list of context sizes to predict on around survey tiles.
+   :type context_sizes: :obj:`list` of :obj:`int`
+   :param n_samples: The number of samples to use to sample featurewise mean and standard deviation.
+   :type n_samples: :obj:`int`, optional
+
+   :returns: None.
+
+
+.. function:: run_footprints(params)
+
+   Execute estimate_footprints with parameters from params dict.
+
+

@@ -1,0 +1,55 @@
+:mod:`functions.population.utilities`
+=====================================
+
+.. py:module:: functions.population.utilities
+
+
+Module Contents
+---------------
+
+.. function:: write_raster(arr, match_filename, dst_filename, dtype=gdal.GDT_Float32)
+
+   Write array to disk with georeferencing of match file.
+
+   :param arr: Array to write to disk.
+   :type arr: np.ndarray
+   :param match_filename: geoTiff to match georeferencing of output with.
+   :type match_filename: str
+   :param dst_filename: Path to write array to.
+   :type dst_filename: str
+   :param dtype: Gdal datatype code to write with.
+   :type dtype: int
+
+   :returns: None
+
+
+.. function:: project_raster(src_filename, match_filename, dst_filename, resampling, n_bands=0)
+
+   Reproject source raster to match georeferencing of match raster, using specified resampling technique. Outputs to disk.
+
+   :param src_filename: Path to raster to reproject.
+   :type src_filename: str
+   :param match_filename: geoTiff to reproject to.
+   :type match_filename: str
+   :param dst_filename: Path to write reprojected raster to.
+   :type dst_filename: str
+   :param resampling: GDAL resmapling code.
+   :type resampling: int
+   :param n_bands: Number of bands to reproject. Defaults to 0 (all bands).
+   :type n_bands: :obj:`int`, optional
+
+   :returns: None
+
+
+.. function:: proximity_raster(src_filename, dst_filename)
+
+   Calculate Euclidean distance to closest True cell for boolean src raster. Outputs to disk.
+
+   :param src_filename: Path to raster to run distance calculation on.
+   :type src_filename: str
+   :param dst_filename: Path to write distance raster to.
+   :type dst_filename: str
+
+   :returns: None
+
+

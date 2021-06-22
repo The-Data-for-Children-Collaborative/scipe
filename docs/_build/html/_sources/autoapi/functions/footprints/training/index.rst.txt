@@ -1,0 +1,100 @@
+:mod:`functions.footprints.training`
+====================================
+
+.. py:module:: functions.footprints.training
+
+.. autoapi-nested-parse::
+
+   Module for training building footprint semantic segmentation models using tf/Keras.
+
+   .. todo:: * Migrate footprints pipeline from tf/Keras to PyTorch.
+
+
+
+Module Contents
+---------------
+
+.. function:: model_from_json(path)
+
+   Load model from json
+
+
+.. function:: load_dataset(train_dir, val_dir, target_size, batch_size, train_count)
+
+   Load semantic segmentation dataset to memory in the form of training and validation iterators.
+
+   :param train_dir: The path to the directory containing training data.
+   :type train_dir: str
+   :param val_dir: The path to the directory containing validation data.
+   :type val_dir: str
+   :param target_size: The target size (height,width) of loaded images.
+   :type target_size: tuple
+   :param batch_size: The batch size of the iterators.
+   :type batch_size: int
+   :param train_count: The number of samples to load from the training dataset.
+   :type train_count: int
+
+   :returns: iterator of training (image,label) pairs.
+             train_size (int): number of batches in train_iterator.
+             val_iterator (tf.keras.preprocessing.image.Iterator): iterator of validation (image,label) pairs.
+             val_size (int): number of batches in val_iterator.
+             beta (float): weight hyperparam for loss function calculated from training set.
+   :rtype: train_iterator (tf.keras.preprocessing.image.Iterator)
+
+
+.. function:: sample_data(path, count, target_size)
+
+   Sample count images from path, scaled to target_size.
+
+
+.. function:: get_image_iterator(path, X_sample, batch_size, target_size)
+
+   Get image iterator loading images in path from disk, fit to X_sample.
+
+
+.. function:: get_label_iterator(path, batch_size, target_size)
+
+   Get label iterator loading images in path from disk.
+
+
+.. function:: get_iterator(path, batch_size, X_sample, target_size)
+
+   Get (image,label) pair iterator, fit to X_sample, loading pairs in path from disk.
+
+
+.. function:: fit_model(model, train_iterator, val_iterator, train_length, val_length, epochs, batch_size, callbacks)
+
+   Fit provided model with parameters
+
+
+.. function:: train(train_dir, val_dir, batch_size=8, epochs=1, beta=5, model_path=None, target_size=(256, 256), n_samples=1000, train_from_disk=False, train_count=10000, callbacks=None)
+
+   Train semantic segmentation model on (image,label) pairs.
+
+   :param train_dir: The directory containing training pairs
+   :type train_dir: str
+   :param val_dir: The directory containing validation pairs
+   :type val_dir: str
+   :param batch_size:
+   :type batch_size: :obj:`int`, optional
+   :param epochs: The number of epochs to train for. Defaults to 1.
+   :type epochs: :obj:`int`, optional
+   :param beta: The weighting parameter for loss function. Defaults to 5.
+   :type beta: :obj:`float`, optional
+   :param model_path: The path to the model to load as base for training. If no path is specified, the model is trained from scratch. Defaults to None.
+   :type model_path: :obj:`str`, optional
+   :param target_size: The target_size to load images and labels to. Defaults to (256,256).
+   :type target_size: :obj:`tuple`, optional
+   :param n_samples: The number of samples to use when determining loss weighting and featurewise mean/std of images. Defaults to 1000.
+   :type n_samples: :obj:`int`, optional
+   :param train_from_disk: Whether to train on data from disk (True) or from memory (False). Defaults to False.
+   :type train_from_disk: :obj:`bool`, optional
+   :param train_count: TThe number of samples to load from the training dataset. Only affects result when train_from_disk is False. Defaults to 10000.
+   :type train_count: :obj:`int`, optional
+   :param callbacks: List of Keras callbacks to apply while training. Defaults to [].
+   :type callbacks: :obj:`list`,optional
+
+       Returns:
+           (tf.keras.Model,dict): The trained model, and training history.
+
+

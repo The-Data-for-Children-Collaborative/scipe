@@ -1,0 +1,15 @@
+:mod:`functions.footprints.models`
+==================================
+
+.. py:module:: functions.footprints.models
+
+
+Module Contents
+---------------
+
+.. function:: get_unet_vgg16(n_classes, input_shape, batch_norm=False, dropout=False, dropout_rate=0.2, seed=42, frozen=True)
+
+
+.. function:: get_unet(n_classes, input_shape, batch_norm=False, dropout=False, dropout_rate=0.2, seed=42)
+
+

@@ -1,0 +1,53 @@
+:mod:`functions.population.models`
+==================================
+
+.. py:module:: functions.population.models
+
+.. autoapi-nested-parse::
+
+   Module containing getters for untrained population models.
+
+
+
+Module Contents
+---------------
+
+.. function:: get_poisson()
+
+   Return grid search instance for Poisson regression model.
+
+
+.. function:: get_rf(prng)
+
+   Get grid search instance for Random Forest regression model.
+
+   :param prng: Random state used to construct forest.
+   :type prng: :obj:`np.random.RandomState`
+
+   :returns: Random Forest grid search instance.
+   :rtype: sklearn.model_selection.GridSearchCV
+
+
+.. function:: get_lasso()
+
+   Return grid search instance for lasso regression model.
+
+
+.. function:: get_dummy()
+
+   Return grid search instance for dummy regression model (returns mean of training set).
+
+
+.. function:: get_model(model_name, prng)
+
+   Get grid search instance for specified regression model.
+
+   :param model_name: Name of regression model.
+   :type model_name: str
+   :param prng: Random state used for stochastic models.
+   :type prng: :obj:`np.random.RandomState`
+
+   :returns: Model grid search instance.
+   :rtype: sklearn.model_selection.GridSearchCV
+
+

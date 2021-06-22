@@ -1,0 +1,69 @@
+:mod:`functions.embeddings.models`
+==================================
+
+.. py:module:: functions.embeddings.models
+
+.. autoapi-nested-parse::
+
+   Module containing models used to embed remote sensing tiles.
+
+
+
+Module Contents
+---------------
+
+.. data:: deepcluster_path
+   :annotation: = ./representation/deepcluster/deepclusterv2_800ep_pretrain.pth.tar
+
+   Path to deepcluster model weights.
+
+   :type: str
+
+
+.. function:: get_swav()
+
+   Returns (model,preprocessing) pair, where model is a PyTorch ResNet50 model pretrained on ImageNet using
+   SwAV, and preprocessing is a function that preprocesses a PIL image.
+
+
+.. function:: get_barlow()
+
+   Returns (model,preprocessing) pair, where model is a PyTorch ResNet50 model pretrained on ImageNet using
+   Barlow Twins, and preprocessing is a function that preprocesses a PIL image.
+
+
+.. function:: get_inception()
+
+   Returns (model,preprocessing) pair, where model is a PyTorch inceptionV3 model pretrained on ImageNet,
+   and preprocessing is a function that preprocesses a PIL image.
+
+
+.. function:: get_densenet()
+
+   Returns (model,preprocessing) pair, where model is a PyTorch DenseNet161 model pretrained on ImageNet,
+   and preprocessing is a function that preprocesses a PIL image.
+
+
+.. function:: get_resnet()
+
+   Returns (model,preprocessing) pair, where model is a PyTorch ResNet50 model pretrained on ImageNet,
+   and preprocessing is a function that preprocesses a PIL image.
+
+
+.. function:: get_vgg16()
+
+   Returns (model,preprocessing) pair, where model is a PyTorch VGG16 model pretrained on ImageNet,
+   and preprocessing is a function that preprocesses a PIL image.
+
+
+.. function:: get_deepcluster()
+
+   Returns (model,preprocessing) pair, where model is a PyTorch ResNet50 model pretrained on ImageNet using
+   DeepCluster, and preprocessing is a function that preprocesses a PIL image.
+
+
+.. function:: get_model(model_name)
+
+   Lookup model by name.
+
+

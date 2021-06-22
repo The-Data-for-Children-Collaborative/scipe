@@ -1,0 +1,74 @@
+:mod:`functions.footprints.generator`
+=====================================
+
+.. py:module:: functions.footprints.generator
+
+
+Module Contents
+---------------
+
+.. class:: SatelliteImageDataGenerator(img, labels, img_size, batch_size, n_samples)
+
+
+   Bases: :py:obj:`keras.utils.Sequence`
+
+   Data generator used to randomly sample large satellite image. Stores band-wise mean and std for image
+   centering.
+
+   .. method:: __len__(self)
+
+      Number of batch in the Sequence.
+
+      # Returns
+          The number of batches in the Sequence.
+
+
+   .. method:: __getitem__(self, index)
+
+      Gets batch at position `index`.
+
+      # Arguments
+          index: position of the batch in the Sequence.
+
+      # Returns
+          A batch
+
+
+   .. method:: fit(self, img_fit)
+
+
+   .. method:: flow(self, X)
+
+
+   .. method:: to_json(self, path)
+
+
+
+.. class:: MultiSatelliteImageDataGenerator(generators, batch_size, n_samples, weights=None)
+
+
+   Bases: :py:obj:`keras.utils.Sequence`
+
+   Multi-image version of SatelliteImageDataGenerator. Randomly chooses between both samplers each item of
+   batch.
+
+   .. method:: __len__(self)
+
+      Number of batch in the Sequence.
+
+      # Returns
+          The number of batches in the Sequence.
+
+
+   .. method:: __getitem__(self, index)
+
+      Gets batch at position `index`.
+
+      # Arguments
+          index: position of the batch in the Sequence.
+
+      # Returns
+          A batch
+
+
+

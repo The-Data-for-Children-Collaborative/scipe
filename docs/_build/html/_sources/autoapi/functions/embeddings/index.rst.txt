@@ -1,0 +1,18 @@
+:mod:`functions.embeddings`
+===========================
+
+.. py:module:: functions.embeddings
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   layers/index.rst
+   models/index.rst
+   prediction/index.rst
+   visualization/index.rst
+
+

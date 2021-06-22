@@ -1,0 +1,46 @@
+:mod:`functions.embeddings.visualization`
+=========================================
+
+.. py:module:: functions.embeddings.visualization
+
+
+Module Contents
+---------------
+
+.. data:: SEED
+   :annotation: = 42
+
+   Seed to control randomness.
+
+
+.. data:: prng
+   
+
+   Numpy random state based on SEED.
+
+   :type: np.random.RandomState
+
+
+.. function:: plot_tiles(embds, tiles, pops=None, zoom=0.1)
+
+   Plot 2D tile embeddings, optionally coloured by list of population labels
+
+
+.. function:: interpolate_feature(model, tiles_master, preprocessing, dim, n=5)
+
+   Return n indices that interpolate through tiles in specified dimension of embedding.
+
+
+.. function:: reduce_tsne(model, tiles, preprocessing)
+
+
+.. function:: visualize_embeddings(model, tiles_master, preprocessing, zoom=0.1)
+
+   Visualize model embeddings of tiles using T-SNE.
+
+
+.. function:: visualize_embeddings_df(model, df, preprocessing, input_shape, zoom=0.1)
+
+   Visualize model embeddings of tiles in dataframe df using T-SNE.
+
+

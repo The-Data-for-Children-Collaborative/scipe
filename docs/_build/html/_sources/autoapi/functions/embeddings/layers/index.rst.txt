@@ -1,0 +1,26 @@
+:mod:`functions.embeddings.layers`
+==================================
+
+.. py:module:: functions.embeddings.layers
+
+
+Module Contents
+---------------
+
+.. class:: LambdaLayer(lambd)
+
+
+   Bases: :py:obj:`torch.nn.Module`
+
+   Layer that applies arbitrary function in forward pass.
+
+   .. attribute:: lambd
+
+      Function to apply in forward pass.
+
+      :type: function
+
+   .. method:: forward(self, x)
+
+
+

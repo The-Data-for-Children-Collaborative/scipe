@@ -1,0 +1,14 @@
+:mod:`functions.footprints.dice`
+================================
+
+.. py:module:: functions.footprints.dice
+
+
+Module Contents
+---------------
+
+.. function:: dice_coef(y_true, y_pred, smooth_bias=1)
+
+   Calculate dice coefficient from observed vs predicted values
+
+

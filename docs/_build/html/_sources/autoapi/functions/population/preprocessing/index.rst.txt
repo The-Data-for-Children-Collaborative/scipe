@@ -1,0 +1,169 @@
+:mod:`functions.population.preprocessing`
+=========================================
+
+.. py:module:: functions.population.preprocessing
+
+.. autoapi-nested-parse::
+
+   Module for preprocessing remote sensing data, including reprojecting data to match microcensus grid.
+
+   .. todo::
+
+      * Take vector road data as input and rasterize in pipeline.
+      * Compute road density vs. distance to road.
+
+
+
+Module Contents
+---------------
+
+.. data:: lcc_class_values
+   
+
+   Maps raw Coepernicus LCC class values to simplified class values.
+
+   :type: dict
+
+
+.. data:: lcc_class_names
+   
+
+   Maps simplified class values to names.
+
+   :type: dict
+
+
+.. data:: resamplers_table
+   
+
+   Maps resmpler name to GDAL resampler code.
+
+   :type: dict
+
+
+.. function:: ndvi_landsat_f(raster)
+
+   Calculate ndvi for landsat raster.
+
+
+.. function:: ndwi_landsat_f(raster)
+
+   Calculate ndwi for landsat raster.
+
+
+.. data:: indices_table
+   
+
+   Maps index name to function that calculates it on Landsat data.
+
+   :type: dict
+
+
+.. function:: reproject_data(in_dir, in_rasters, ref_rasters, out_dir, rois, resampling)
+
+   Reproject input rasters to the relevant reference grid, using dictated resampling method.
+
+   :param in_dir: The path to the input data directory.
+   :type in_dir: str
+   :param in_rasters: The names of input rasters within in_dir.
+   :type in_rasters: str
+   :param ref_rasters: The path to reference grid for each roi.
+   :type ref_rasters: :obj:`list` of :obj:`str`
+   :param out_dir: The output directory.
+   :type out_dir: str
+   :param rois: The names of rois.
+   :type rois: :obj:`list` of :obj:`str`
+   :param resampling: The resampling technique code used for each input raster.
+   :type resampling: :obj:`list` of :obj:`int`
+
+   :returns: None.
+
+
+.. function:: compute_indices(out_dir, filename, rois, indices)
+
+   Calculate listed indices for each roi using landsat data from filename.
+
+   :param out_dir: The out path for processed data, including indices.
+   :type out_dir: str
+   :param filename: The name of the landsat data in each roi's directory.
+   :type filename: str
+   :param rois: The names of rois.
+   :type rois: :obj:`list` of :obj:`str`
+   :param indices: The names of indices to be computed (ndvi and ndwi supported).
+   :type indices: :obj:`list` of :obj:`str`
+
+   :returns: None.
+
+
+.. function:: compute_road_dist(out_dir, filename, rois)
+
+   Calculate distance to road for each roi using road data from filename.
+
+   :param out_dir: The out path for processed data.
+   :type out_dir: str
+   :param filename: The name of the road data in each roi's directory.
+   :type filename: str
+   :param rois: The names of rois.
+   :type rois: :obj:`list` of :obj:`str`
+
+   :returns: None.
+
+
+.. function:: process_lcc(src_dir, filename, rois)
+
+   Process landcover classification by simplifying classes and saving to per-class rasters.
+
+   :param src_dir: The path to the directory containing lcc for each roi.
+   :type src_dir: str
+   :param filename: The name of the lcc in each roi's directory.
+   :type filename: str
+   :param rois: The names of rois.
+   :type rois: :obj:`list` of :obj:`str`
+
+   :returns: None.
+
+
+.. function:: process_landsat(src_dir, filename, rois)
+
+   Split landsat data by saving to per-band rasters.
+
+   :param src_dir: The path to the directory containing landsat for each roi.
+   :type src_dir: str
+   :param filename: The name of the landsat raster in each roi's directory.
+   :type filename: str
+   :param rois: The names of rois.
+   :type rois: list
+
+   :returns: None.
+
+
+.. function:: process_footprints(footprint_dirs, model_names, thresholds, pop_rasters, rois, out_dir)
+
+   Compute building footprint area for each roi for all tiles in footprints_dir.
+
+   :param footprint_dirs: The path to the footprint directory for each model.
+   :type footprint_dirs: :obj:`list` of :obj:`str`
+   :param model_names: The name of each model.
+   :type model_names: :obj:`list` of :obj:`str`
+   :param thresholds: The threshold used for each model.
+   :type thresholds: :obj:`list` of :obj:`float`
+   :param pop_rasters: The path to reference grid for each roi.
+   :type pop_rasters: :obj:`list` of :obj:`str`
+   :param rois: The names of rois.
+   :type rois: :obj:`list` of :obj:`str`
+   :param out_dir: The output directory.
+   :type out_dir: str
+
+   :returns: None
+
+
+.. function:: preprocess_data(params)
+
+   Preprocess data according to specifications in file params_path. All rasters output to disk.
+
+   :param params: A dictionary holding parameters.
+   :type params: dict
+
+   :returns: None.
+
+
