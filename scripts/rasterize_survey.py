@@ -1,3 +1,9 @@
+""" Script for rasterizing survey data.
+
+Usage:
+    ``python rasterize_survey.py <path_to_config>``
+"""
+
 import yaml
 import sys
 import os

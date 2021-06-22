@@ -1,3 +1,9 @@
+""" Script for running population estimation pipeline.
+
+Usage:
+    ``python run_pipeline.py <path_to_config>`` (run from parent directory)
+"""
+
 import yaml
 import sys
 import os

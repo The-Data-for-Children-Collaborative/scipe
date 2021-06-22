@@ -144,6 +144,7 @@
 <li class="toctree-l3"><a class="reference internal" href="autoapi/scripts/estimate_footprints/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">scripts.estimate_footprints</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="autoapi/scripts/rasterize_survey/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">scripts.rasterize_survey</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="autoapi/scripts/run_pipeline/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">scripts.run_pipeline</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoapi/scripts/split_imagery/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">scripts.split_imagery</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -165,7 +166,7 @@
         
 <section class="genindex-section">
   <h1 id="index">Index</h1>
-  <div class="genindex-jumpbox"><a href="#_"><strong>_</strong></a> | <a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a></div>
+  <div class="genindex-jumpbox"><a href="#_"><strong>_</strong></a> | <a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a></div>
 </section>
 <section id="_" class="genindex-section">
   <h2>_</h2>
@@ -217,6 +218,8 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="autoapi/functions/population/data/index.html#functions.population.data.build_row">build_row() (in module functions.population.data)</a>
 </li>
+        <li><a href="autoapi/scripts/split_imagery/index.html#scripts.split_imagery.build_vrt">build_vrt() (in module scripts.split_imagery)</a>
+</li>
     </ul></td>
   </tr></table>
 </section>
@@ -227,9 +230,11 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="autoapi/functions/population/preprocessing/index.html#functions.population.preprocessing.compute_indices">compute_indices() (in module functions.population.preprocessing)</a>
 </li>
+        <li><a href="autoapi/functions/population/preprocessing/index.html#functions.population.preprocessing.compute_road_dist">compute_road_dist() (in module functions.population.preprocessing)</a>
+</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="autoapi/functions/population/preprocessing/index.html#functions.population.preprocessing.compute_road_dist">compute_road_dist() (in module functions.population.preprocessing)</a>
+        <li><a href="autoapi/scripts/split_imagery/index.html#scripts.split_imagery.crop_img">crop_img() (in module scripts.split_imagery)</a>
 </li>
         <li><a href="autoapi/functions/population/prediction/index.html#functions.population.prediction.cross_val">cross_val() (in module functions.population.prediction)</a>
 </li>
@@ -453,6 +458,8 @@
   <h2>G</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/scripts/split_imagery/index.html#scripts.split_imagery.get_all">get_all() (in module scripts.split_imagery)</a>
+</li>
         <li><a href="autoapi/functions/population/survey/index.html#functions.population.survey.get_arr">get_arr() (in module functions.population.survey)</a>
 </li>
         <li><a href="autoapi/functions/embeddings/models/index.html#functions.embeddings.models.get_barlow">get_barlow() (in module functions.embeddings.models)</a>
@@ -468,7 +475,11 @@
         <li><a href="autoapi/functions/population/models/index.html#functions.population.models.get_dummy">get_dummy() (in module functions.population.models)</a>
 </li>
         <li><a href="autoapi/functions/population/survey/index.html#functions.population.survey.get_extent">get_extent() (in module functions.population.survey)</a>
+
+        <ul>
+          <li><a href="autoapi/scripts/split_imagery/index.html#scripts.split_imagery.get_extent">(in module scripts.split_imagery)</a>
 </li>
+        </ul></li>
         <li><a href="autoapi/functions/footprints/training/index.html#functions.footprints.training.get_image_iterator">get_image_iterator() (in module functions.footprints.training)</a>
 </li>
         <li><a href="autoapi/functions/embeddings/models/index.html#functions.embeddings.models.get_inception">get_inception() (in module functions.embeddings.models)</a>
@@ -479,23 +490,29 @@
 </li>
         <li><a href="autoapi/functions/population/models/index.html#functions.population.models.get_lasso">get_lasso() (in module functions.population.models)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="autoapi/functions/population/prediction/index.html#functions.population.prediction.get_metrics">get_metrics() (in module functions.population.prediction)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="autoapi/functions/embeddings/models/index.html#functions.embeddings.models.get_model">get_model() (in module functions.embeddings.models)</a>
 
         <ul>
           <li><a href="autoapi/functions/population/models/index.html#functions.population.models.get_model">(in module functions.population.models)</a>
 </li>
         </ul></li>
+        <li><a href="autoapi/scripts/split_imagery/index.html#scripts.split_imagery.get_overlap_imgs">get_overlap_imgs() (in module scripts.split_imagery)</a>
+</li>
         <li><a href="autoapi/functions/population/models/index.html#functions.population.models.get_poisson">get_poisson() (in module functions.population.models)</a>
 </li>
         <li><a href="autoapi/functions/embeddings/models/index.html#functions.embeddings.models.get_resnet">get_resnet() (in module functions.embeddings.models)</a>
 </li>
         <li><a href="autoapi/functions/population/models/index.html#functions.population.models.get_rf">get_rf() (in module functions.population.models)</a>
 </li>
+        <li><a href="autoapi/scripts/split_imagery/index.html#scripts.split_imagery.get_shape">get_shape() (in module scripts.split_imagery)</a>
+</li>
         <li><a href="autoapi/functions/population/prediction/index.html#functions.population.prediction.get_split">get_split() (in module functions.population.prediction)</a>
+</li>
+        <li><a href="autoapi/scripts/split_imagery/index.html#scripts.split_imagery.get_srs">get_srs() (in module scripts.split_imagery)</a>
 </li>
         <li><a href="autoapi/functions/embeddings/models/index.html#functions.embeddings.models.get_swav">get_swav() (in module functions.embeddings.models)</a>
 </li>
@@ -521,10 +538,12 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="autoapi/functions/population/data/index.html#functions.population.data.in_bounds">in_bounds() (in module functions.population.data)</a>
 </li>
-        <li><a href="autoapi/functions/population/preprocessing/index.html#functions.population.preprocessing.indices_table">indices_table (in module functions.population.preprocessing)</a>
+        <li><a href="autoapi/scripts/split_imagery/index.html#scripts.split_imagery.in_range">in_range() (in module scripts.split_imagery)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/functions/population/preprocessing/index.html#functions.population.preprocessing.indices_table">indices_table (in module functions.population.preprocessing)</a>
+</li>
         <li><a href="autoapi/functions/population/data/index.html#functions.population.data.init_cols">init_cols() (in module functions.population.data)</a>
 </li>
         <li><a href="autoapi/functions/embeddings/visualization/index.html#functions.embeddings.visualization.interpolate_feature">interpolate_feature() (in module functions.embeddings.visualization)</a>
@@ -629,6 +648,8 @@
 </li>
           <li><a href="autoapi/scripts/run_pipeline/index.html#module-scripts.run_pipeline">scripts.run_pipeline</a>
 </li>
+          <li><a href="autoapi/scripts/split_imagery/index.html#module-scripts.split_imagery">scripts.split_imagery</a>
+</li>
         </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
@@ -647,6 +668,16 @@
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="autoapi/functions/population/preprocessing/index.html#functions.population.preprocessing.ndwi_landsat_f">ndwi_landsat_f() (in module functions.population.preprocessing)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="O" class="genindex-section">
+  <h2>O</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/scripts/split_imagery/index.html#scripts.split_imagery.overlapping">overlapping() (in module scripts.split_imagery)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -710,14 +741,16 @@
 </li>
         <li><a href="autoapi/functions/embeddings/visualization/index.html#functions.embeddings.visualization.reduce_tsne">reduce_tsne() (in module functions.embeddings.visualization)</a>
 </li>
+        <li><a href="autoapi/scripts/split_imagery/index.html#scripts.split_imagery.remove_all">remove_all() (in module scripts.split_imagery)</a>
+</li>
         <li><a href="autoapi/functions/population/preprocessing/index.html#functions.population.preprocessing.reproject_data">reproject_data() (in module functions.population.preprocessing)</a>
 </li>
         <li><a href="autoapi/functions/population/preprocessing/index.html#functions.population.preprocessing.resamplers_table">resamplers_table (in module functions.population.preprocessing)</a>
 </li>
-        <li><a href="autoapi/functions/embeddings/prediction/index.html#functions.embeddings.prediction.run_embeddings">run_embeddings() (in module functions.embeddings.prediction)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/functions/embeddings/prediction/index.html#functions.embeddings.prediction.run_embeddings">run_embeddings() (in module functions.embeddings.prediction)</a>
+</li>
         <li><a href="autoapi/functions/population/prediction/index.html#functions.population.prediction.run_estimation">run_estimation() (in module functions.population.prediction)</a>
 </li>
         <li><a href="autoapi/functions/population/prediction/index.html#functions.population.prediction.run_experiment">run_experiment() (in module functions.population.prediction)</a>
@@ -754,8 +787,6 @@
           <li><a href="autoapi/scripts/estimate_footprints/index.html#module-scripts.estimate_footprints">module</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     scripts.rasterize_survey
 
@@ -763,11 +794,20 @@
           <li><a href="autoapi/scripts/rasterize_survey/index.html#module-scripts.rasterize_survey">module</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     scripts.run_pipeline
 
         <ul>
           <li><a href="autoapi/scripts/run_pipeline/index.html#module-scripts.run_pipeline">module</a>
+</li>
+        </ul></li>
+        <li>
+    scripts.split_imagery
+
+        <ul>
+          <li><a href="autoapi/scripts/split_imagery/index.html#module-scripts.split_imagery">module</a>
 </li>
         </ul></li>
         <li><a href="autoapi/functions/embeddings/visualization/index.html#functions.embeddings.visualization.SEED">SEED (in module functions.embeddings.visualization)</a>
@@ -776,6 +816,8 @@
           <li><a href="autoapi/scripts/run_pipeline/index.html#scripts.run_pipeline.SEED">(in module scripts.run_pipeline)</a>
 </li>
         </ul></li>
+        <li><a href="autoapi/scripts/split_imagery/index.html#scripts.split_imagery.split_dataset">split_dataset() (in module scripts.split_imagery)</a>
+</li>
     </ul></td>
   </tr></table>
 </section>

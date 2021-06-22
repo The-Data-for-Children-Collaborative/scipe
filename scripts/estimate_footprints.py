@@ -1,3 +1,9 @@
+""" Script for estimating building footprints.
+
+Usage:
+    ``python estimate_footprints.py <path_to_config>``
+"""
+
 import yaml
 import sys
 import os

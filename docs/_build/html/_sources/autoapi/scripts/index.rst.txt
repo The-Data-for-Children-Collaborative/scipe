@@ -13,5 +13,6 @@ Submodules
    estimate_footprints/index.rst
    rasterize_survey/index.rst
    run_pipeline/index.rst
+   split_imagery/index.rst
 
 

@@ -3,6 +3,14 @@
 
 .. py:module:: scripts.estimate_footprints
 
+.. autoapi-nested-parse::
+
+   Script for estimating building footprints.
+
+   Usage:
+       ``python estimate_footprints.py <path_to_config>``
+
+
 
 Module Contents
 ---------------

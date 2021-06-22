@@ -3,6 +3,14 @@
 
 .. py:module:: scripts.run_pipeline
 
+.. autoapi-nested-parse::
+
+   Script for running population estimation pipeline.
+
+   Usage:
+       ``python run_pipeline.py <path_to_config>`` (run from parent directory)
+
+
 
 Module Contents
 ---------------
