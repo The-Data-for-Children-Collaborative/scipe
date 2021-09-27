@@ -14,7 +14,7 @@ preprocessing:
         - average
         - nearest
         - max
-    indices: [ndvi,ndwi] # incides to compute using landsat data
+    indices: [ndvi,ndwi] # incides to compute using landsat data TODO: rename landsat_indices
     rois: [boa,mgd] # rois to run preprocessing over
     pop_rasters: # population count raster for each roi in geoTiff format
         - ./data/pop/boa_pop.tif
