@@ -44,6 +44,7 @@ dataset:
 #     zero_label_paths: # optional: paths to zero labels in addition to the survey
 #         - ./data/pop/boa_zero.pkl
 #         - ./data/pop/mgd_zero.pkl
+# TODO: add output csv path
 
 # Embedding parameters
 embedding:
