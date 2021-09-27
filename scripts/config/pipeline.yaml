@@ -69,6 +69,8 @@ embedding:
         batch_size: 32 # batch size for training
         frozen_epochs: 1 # numer of epochs to train head of model for with encoder frozen
         epochs: 0 # numer of epochs to train full model for with discriminative learning rate
+        save_models: True # TODO
+        model_output: ''  # TODO
 
 # Population prediction parameters
 prediction:
