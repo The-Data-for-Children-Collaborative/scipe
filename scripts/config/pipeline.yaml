@@ -19,7 +19,7 @@ preprocessing:
     pop_rasters: # population count raster for each roi in geoTiff format
         - ./data/pop/boa_pop.tif
         - ./data/pop/mgd_pop.tif
-    output_dir: ./data/processed/
+    output_dir: ./data/processed/ # will contain processed data, one folder per ROI
     landcover: landcover.tif # name of copernicus landcover map
     landsat: landsat.tif # name of landsat raster
     roads: roads.tif # name of roads raster
