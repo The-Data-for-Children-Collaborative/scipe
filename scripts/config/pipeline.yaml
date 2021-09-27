@@ -106,7 +106,7 @@ estimation:
     model: lasso
     log: False
     include_outliers: False # whether to include survey outliers when training
-    embed: True
+    embed: True # run embeddings as per 'embedding' params
     feature_set: ./scripts/config/features/swav.csv
     prediction_dir: ./predictions/swav_lasso_no_outlier/
 #     hurdle_feature: building_area_ss2_2 # if specified feature is zero, set population to zero
