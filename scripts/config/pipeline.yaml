@@ -27,7 +27,7 @@ preprocessing:
         - ./spacenet/models/model_1_old/pred/
         - ./spacesur/dataset_2/models/model_1/pred/
         - ./spacesur/dataset_2/models/model_2/pred/
-    model_names: [sn,ss2_1,ss2_2] # names of models associated with each footprint dir
+    model_names: [sn,ss2_1,ss2_2] # names of models associated with each footprint dir (spacenet, spacesur dataset 2 model 1 etc.)
     thresholds: [0.5,0.2,0.5] # thresholds to apply to each set of footprints
 
 # Dataset construction parameters
