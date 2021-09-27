@@ -70,6 +70,8 @@ def cross_val(reg_master, df, features, target, return_models=True, log=False):
     if len(ks) == 0:
         print("No folds specified in dataframe")
         return
+
+    print(features)
     y_pred = []
     y_var = []
     models = []
@@ -112,7 +114,7 @@ def cross_val(reg_master, df, features, target, return_models=True, log=False):
     if log:
         y_pred = np.exp(y_pred)
     if return_models:
-        return np.array(y_pred), np.array(y_var), models  # TODO: bad practice to vary return type?
+        return np.array(y_pred), np.array(y_var), models  # TODO: bad practice to vary return type
     else:
         return np.array(y_pred), np.array(y_var)
 

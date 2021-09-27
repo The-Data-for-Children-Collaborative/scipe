@@ -113,6 +113,7 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 current has-children"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l3 current has-children"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../finetuning/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings.finetuning</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../layers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings.layers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings.models</span></code></a></li>
 <li class="toctree-l4 current current-page"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings.prediction</span></code></a></li>
@@ -175,19 +176,31 @@
 </div>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="py data">
+<dt id="functions.embeddings.prediction.chained_assignment">
+<code class="sig-prename descclassname"><span class="pre">functions.embeddings.prediction.</span></code><code class="sig-name descname"><span class="pre">chained_assignment</span></code><a class="headerlink" href="#functions.embeddings.prediction.chained_assignment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py function">
 <dt id="functions.embeddings.prediction.embed_tile_torch">
 <code class="sig-prename descclassname"><span class="pre">functions.embeddings.prediction.</span></code><code class="sig-name descname"><span class="pre">embed_tile_torch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.embeddings.prediction.embed_tile_torch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Embed prepared tile using torch model.</p>
 </dd></dl>
 <dl class="py function">
+<dt id="functions.embeddings.prediction.append_file_name">
+<code class="sig-prename descclassname"><span class="pre">functions.embeddings.prediction.</span></code><code class="sig-name descname"><span class="pre">append_file_name</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiles_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.embeddings.prediction.append_file_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py function">
 <dt id="functions.embeddings.prediction.embed_survey_tiles">
-<code class="sig-prename descclassname"><span class="pre">functions.embeddings.prediction.</span></code><code class="sig-name descname"><span class="pre">embed_survey_tiles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocess_input</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.embeddings.prediction.embed_survey_tiles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Embed survey tiles in df using torch model.</p>
+<code class="sig-prename descclassname"><span class="pre">functions.embeddings.prediction.</span></code><code class="sig-name descname"><span class="pre">embed_survey_tiles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocessing</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.embeddings.prediction.embed_survey_tiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Embed survey tiles in df using torch model, with preprocessing function applied.</p>
 </dd></dl>
 <dl class="py function">
+<dt id="functions.embeddings.prediction.embed_survey_tiles_folds">
+<code class="sig-prename descclassname"><span class="pre">functions.embeddings.prediction.</span></code><code class="sig-name descname"><span class="pre">embed_survey_tiles_folds</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocessing</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.embeddings.prediction.embed_survey_tiles_folds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py function">
 <dt id="functions.embeddings.prediction.run_embeddings">
-<code class="sig-prename descclassname"><span class="pre">functions.embeddings.prediction.</span></code><code class="sig-name descname"><span class="pre">run_embeddings</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rm_zero</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.embeddings.prediction.run_embeddings" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">functions.embeddings.prediction.</span></code><code class="sig-name descname"><span class="pre">run_embeddings</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rm_zero</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.embeddings.prediction.run_embeddings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run and save embeddings to df. Optionally append precomputed embeddings from disk.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -246,8 +259,11 @@
             <ul>
 <li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings.prediction</span></code></a><ul>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#functions.embeddings.prediction.chained_assignment">chained_assignment</a></li>
 <li><a class="reference internal" href="#functions.embeddings.prediction.embed_tile_torch">embed_tile_torch</a></li>
+<li><a class="reference internal" href="#functions.embeddings.prediction.append_file_name">append_file_name</a></li>
 <li><a class="reference internal" href="#functions.embeddings.prediction.embed_survey_tiles">embed_survey_tiles</a></li>
+<li><a class="reference internal" href="#functions.embeddings.prediction.embed_survey_tiles_folds">embed_survey_tiles_folds</a></li>
 <li><a class="reference internal" href="#functions.embeddings.prediction.run_embeddings">run_embeddings</a></li>
 </ul>
 </li>

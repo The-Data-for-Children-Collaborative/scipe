@@ -151,7 +151,7 @@ def get_iterator(path, batch_size, X_sample,
     """ Get (image,label) pair iterator, fit to X_sample, loading pairs in path from disk. """
     image_iterator = get_image_iterator(path + 'images/', X_sample, batch_size, target_size)
     label_iterator = get_label_iterator(path + 'labels/', batch_size, target_size)
-    return (zip(image_iterator, label_iterator), len(image_iterator))
+    return zip(image_iterator, label_iterator), len(image_iterator)
 
 
 def fit_model(model, train_iterator, val_iterator, train_length, val_length, epochs, batch_size, callbacks):

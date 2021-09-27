@@ -36,7 +36,7 @@ if __name__ == "__main__":
         df = build_dataset(params['dataset'])
 
         if params['embedding']['run'] or (params['estimation']['run'] and params['estimation']['embed']):
-            df = run_embeddings(df, params['embedding'], 'zero_label_paths' not in params['dataset'])
+            df = run_embeddings(df, params['embedding'], 'zero_label_paths' not in params['dataset'], SEED)
         else:
             print("Skipping embeddings")
 

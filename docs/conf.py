@@ -35,6 +35,7 @@ extensions = ['sphinx.ext.napoleon', 'autoapi.extension', 'sphinx.ext.todo']
 
 autoapi_type = 'python'
 autoapi_dirs = ['../functions/', '../scripts/']
+autoapi_ignore = ['*checkpoint*']
 autoapi_options = ['members', 'undoc-members', 'private-members', 'show-inheritance', 'special-members', 'imported-members']
 napoleon_google_docstring = True
 todo_include_todos = True

@@ -4,10 +4,11 @@ import json
 import os
 from tifffile import imsave
 from tqdm import tqdm
-from tensorflow.keras.preprocessing.image import smart_resize, load_img, img_to_array
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
 from population.data import in_bounds
 from population.utilities import write_raster
+
 
 def load_model(model_path, weights_path):
     """ Load Keras model and weights from disk. """
@@ -23,8 +24,8 @@ def load_models(model_paths):
     return [load_model(path + 'model.json', path + 'model.h5') for path in model_paths]
 
 
-def learn_distribution(path, count):
-    """ Learn distribution of imagery by sampling subset. """
+def get_stats(path, count):
+    """ Get mean and std of imagery by sampling subset. """
     ls = np.array(os.listdir(path))
     n = ls.shape[0]
     idxs = np.random.randint(0, n, (count,))
@@ -78,7 +79,7 @@ def estimate_footprints(roi, survey, img_dir, model_dirs, context_sizes, n_sampl
             None.
     """
     context_size = max(context_sizes)
-    mean, std = learn_distribution(img_dir, n_samples)
+    mean, std = get_stats(img_dir, n_samples)
     print(mean, std)
     models = load_models(model_dirs)
     visited = set()
@@ -125,7 +126,7 @@ def estimate_footprints_full(roi, survey, img_dir, model_dirs, context_sizes, n_
             None.
     """
     context_size = max(context_sizes)
-    mean, std = learn_distribution(img_dir, n_samples)
+    mean, std = get_stats(img_dir, n_samples)
     print(mean, std)
     models = load_models(model_dirs)
 

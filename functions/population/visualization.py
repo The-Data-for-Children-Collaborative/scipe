@@ -57,8 +57,8 @@ def prediction_error(df, true='pop', pred='pop_pred', var=None, ax=None, images=
     if not ax:
         f, ax = plt.subplots(figsize=(4, 4))
     # read prediction/truth
-    Y_true = df[true]
-    Y_pred = df[pred]
+    y_true = df[true]
+    y_pred = df[pred]
     # plot data
     if not (images or buildings):
         if color:
@@ -71,8 +71,8 @@ def prediction_error(df, true='pop', pred='pop_pred', var=None, ax=None, images=
                     ax.scatter(df_roi[true], df_roi[pred], alpha=0.75, label=roi.upper(), s=25)
 
     # set the axes limits based on the range of X and Y data
-    ax.set_xlim(Y_true.min() - 1, Y_true.max() + 1)
-    ax.set_ylim(Y_pred.min() - 1, Y_pred.max() + 1)
+    ax.set_xlim(y_true.min() - 1, y_true.max() + 1)
+    ax.set_ylim(y_pred.min() - 1, y_pred.max() + 1)
 
     # square the axes to ensure a 45 degree line
     ylim = ax.get_ylim()
@@ -90,14 +90,14 @@ def prediction_error(df, true='pop', pred='pop_pred', var=None, ax=None, images=
     # ensure the aspect ratio is square
     ax.set_aspect("equal", adjustable="box")
 
-    m, b = np.polyfit(Y_true, Y_pred, 1)
+    m, b = np.polyfit(y_true, y_pred, 1)
     ax.plot(bounds, m * np.array(bounds) + b, 'k--', label='best fit', linewidth=2)
 
     # draw the 45 degree line
     plt.plot(bounds, bounds, '--', alpha=0.5, label='identity', color='#111111', linewidth=2)
 
     if show_metrics:
-        label = f"$R^2 = {r2_score(Y_true, Y_pred):0.3f}$\n$MeAPE = {meape(Y_true, Y_pred):0.3f}$\n$aMeAPE = {ameape(Y_true, Y_pred):0.3f}$\n$MeAE = {median_absolute_error(Y_true, Y_pred):0.2f}$"
+        label = f"$R^2 = {r2_score(y_true, y_pred):0.3f}$\n$MeAPE = {meape(y_true, y_pred):0.3f}$\n$aMeAPE = {ameape(y_true, y_pred):0.3f}$\n$MeAE = {median_absolute_error(y_true, y_pred):0.2f}$"
         ax.text(0.5, 0.98, label,
                 horizontalalignment='center',
                 verticalalignment='top',
@@ -202,7 +202,7 @@ def to_pdf(survey, roi, tiles_path, out_path, points=None, coords=None,
 def get_colors(n, offset=0.7):
     """ Get colormap for n features. """
     cmap = plt.cm.get_cmap('hsv')
-    colors = np.array([cmap((offset + (i) / n) % 1) for i in range(n)])
+    colors = np.array([cmap((offset + i / n) % 1) for i in range(n)])
     return colors
 
 

@@ -24,3 +24,29 @@ Module Contents
 
 
 
+.. class:: PairLayer(model1, model2)
+
+
+   Bases: :py:obj:`torch.nn.Module`
+
+   Layer that returns pair of outputs from models on forward pass.
+
+   .. attribute:: model1
+
+      Model for first output of pair.
+
+      :type: torch.nn.Module
+
+   .. attribute:: model2
+
+      Model for second output of pair.
+
+      :type: torch.nn.Module
+
+   .. method:: __getitem__(self, key)
+
+
+   .. method:: forward(self, x)
+
+
+

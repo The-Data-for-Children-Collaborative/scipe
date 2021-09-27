@@ -10,6 +10,7 @@ Submodules
    :titlesonly:
    :maxdepth: 1
 
+   finetuning/index.rst
    layers/index.rst
    models/index.rst
    prediction/index.rst

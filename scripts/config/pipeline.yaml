@@ -21,7 +21,7 @@ preprocessing:
         - ./data/pop/mgd_pop.tif
     output_dir: ./data/processed/
     landcover: landcover.tif # name of copernicus landcover map
-    landsat: landsat.tif # namne of landsat raster
+    landsat: landsat.tif # name of landsat raster
     roads: roads.tif # name of roads raster
     footprint_dirs: # directories storing building footprint rasters, containing a sub-folders for each roi (must be saved as probability maps)
         - ./spacenet/models/model_1_old/pred/
@@ -63,6 +63,11 @@ embedding:
 #         - ./csv/embeddings/barlow_nosplit_15_5.csv
     rois: [boa,mgd]
     tiles_path: ./survey_tiles/
+    finetuning:
+        run: True # whether to fine tune models
+        batch_size: 32 # batch size for training
+        frozen_epochs: 1 # numer of epochs to train head of model for with encoder frozen
+        epochs: 0 # numer of epochs to train full model for with discriminative learning rate
 
 # Population prediction parameters
 prediction:
@@ -79,13 +84,13 @@ prediction:
 #         - ./scripts/config/features/resnet.csv
 #         - ./scripts/config/features/densenet.csv
 #         - ./scripts/config/features/vgg16.csv
-    experiment_dir: ./experiments/pretrained/ # where to output experiment results
+    experiment_dir: ./experiments/ft_pipeline/ # where to output experiment results
     models: # models to run experiments with, choose from [lasso, rf, poisson, dummy]
-#         - lasso
-        - rf
+         - lasso
+#        - rf
     log: # whether to predict log of population for each model
 #         - False
-        - False
+        - True
     show_roi: False # whether to give access to roi as a feature
 
 # Population estimation (i.e. over entire roi) parameters

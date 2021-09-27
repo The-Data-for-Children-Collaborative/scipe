@@ -1,6 +1,5 @@
-"""
-Module for rasterizing survey data. NOTE: this is dependent on survey details, so must be modified for each survey format.
-"""
+"""Module for rasterizing survey data. NOTE: this is dependent on survey details, so must be modified for each survey
+format. """
 
 import pandas as pd
 import numpy as np

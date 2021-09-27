@@ -14,17 +14,28 @@
 Module Contents
 ---------------
 
+.. data:: chained_assignment
+   
+
+   
+
 .. function:: embed_tile_torch(tile, model)
 
    Embed prepared tile using torch model.
 
 
-.. function:: embed_survey_tiles(df, model, model_name, preprocess_input)
-
-   Embed survey tiles in df using torch model.
+.. function:: append_file_name(df, tiles_path)
 
 
-.. function:: run_embeddings(df, params, rm_zero)
+.. function:: embed_survey_tiles(df, model, model_name, preprocessing)
+
+   Embed survey tiles in df using torch model, with preprocessing function applied.
+
+
+.. function:: embed_survey_tiles_folds(df, models, model_name, preprocessing)
+
+
+.. function:: run_embeddings(df, params, rm_zero, seed)
 
    Run and save embeddings to df. Optionally append precomputed embeddings from disk.
 

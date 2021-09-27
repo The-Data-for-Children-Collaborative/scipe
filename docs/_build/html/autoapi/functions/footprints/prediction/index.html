@@ -113,6 +113,7 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 current has-children"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../embeddings/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../embeddings/finetuning/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings.finetuning</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../embeddings/layers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings.layers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../embeddings/models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings.models</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../embeddings/prediction/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings.prediction</span></code></a></li>
@@ -179,9 +180,9 @@
 <dd><p>Load list of Keras models and weights from disk.</p>
 </dd></dl>
 <dl class="py function">
-<dt id="functions.footprints.prediction.learn_distribution">
-<code class="sig-prename descclassname"><span class="pre">functions.footprints.prediction.</span></code><code class="sig-name descname"><span class="pre">learn_distribution</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.footprints.prediction.learn_distribution" title="Permalink to this definition">¶</a></dt>
-<dd><p>Learn distribution of imagery by sampling subset.</p>
+<dt id="functions.footprints.prediction.get_stats">
+<code class="sig-prename descclassname"><span class="pre">functions.footprints.prediction.</span></code><code class="sig-name descname"><span class="pre">get_stats</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.footprints.prediction.get_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get mean and std of imagery by sampling subset.</p>
 </dd></dl>
 <dl class="py function">
 <dt id="functions.footprints.prediction.predict_sample">
@@ -292,7 +293,7 @@
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
 <li><a class="reference internal" href="#functions.footprints.prediction.load_model">load_model</a></li>
 <li><a class="reference internal" href="#functions.footprints.prediction.load_models">load_models</a></li>
-<li><a class="reference internal" href="#functions.footprints.prediction.learn_distribution">learn_distribution</a></li>
+<li><a class="reference internal" href="#functions.footprints.prediction.get_stats">get_stats</a></li>
 <li><a class="reference internal" href="#functions.footprints.prediction.predict_sample">predict_sample</a></li>
 <li><a class="reference internal" href="#functions.footprints.prediction.estimate_footprints">estimate_footprints</a></li>
 <li><a class="reference internal" href="#functions.footprints.prediction.estimate_footprints_full">estimate_footprints_full</a></li>

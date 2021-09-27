@@ -17,9 +17,9 @@ Module Contents
    Load list of Keras models and weights from disk.
 
 
-.. function:: learn_distribution(path, count)
+.. function:: get_stats(path, count)
 
-   Learn distribution of imagery by sampling subset.
+   Get mean and std of imagery by sampling subset.
 
 
 .. function:: predict_sample(img, mean, std, model)

@@ -113,6 +113,7 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 current has-children"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l3 current has-children"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../finetuning/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings.finetuning</span></code></a></li>
 <li class="toctree-l4 current current-page"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings.layers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings.models</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../prediction/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings.prediction</span></code></a></li>
@@ -188,6 +189,40 @@
 <code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.embeddings.layers.LambdaLayer.forward" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
+<dl class="py class">
+<dt id="functions.embeddings.layers.PairLayer">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">functions.embeddings.layers.</span></code><code class="sig-name descname"><span class="pre">PairLayer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.embeddings.layers.PairLayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
+<p>Layer that returns pair of outputs from models on forward pass.</p>
+<dl class="py attribute">
+<dt id="functions.embeddings.layers.PairLayer.model1">
+<code class="sig-name descname"><span class="pre">model1</span></code><a class="headerlink" href="#functions.embeddings.layers.PairLayer.model1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model for first output of pair.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt id="functions.embeddings.layers.PairLayer.model2">
+<code class="sig-name descname"><span class="pre">model2</span></code><a class="headerlink" href="#functions.embeddings.layers.PairLayer.model2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model for second output of pair.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="functions.embeddings.layers.PairLayer.__getitem__">
+<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.embeddings.layers.PairLayer.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt id="functions.embeddings.layers.PairLayer.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.embeddings.layers.PairLayer.forward" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
 </div>
 </div>
 
@@ -232,6 +267,13 @@
 <li><a class="reference internal" href="#functions.embeddings.layers.LambdaLayer">LambdaLayer</a><ul>
 <li><a class="reference internal" href="#functions.embeddings.layers.LambdaLayer.lambd">lambd</a></li>
 <li><a class="reference internal" href="#functions.embeddings.layers.LambdaLayer.forward">forward</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#functions.embeddings.layers.PairLayer">PairLayer</a><ul>
+<li><a class="reference internal" href="#functions.embeddings.layers.PairLayer.model1">model1</a></li>
+<li><a class="reference internal" href="#functions.embeddings.layers.PairLayer.model2">model2</a></li>
+<li><a class="reference internal" href="#functions.embeddings.layers.PairLayer.__getitem__">__getitem__</a></li>
+<li><a class="reference internal" href="#functions.embeddings.layers.PairLayer.forward">forward</a></li>
 </ul>
 </li>
 </ul>

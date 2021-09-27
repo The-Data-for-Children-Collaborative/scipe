@@ -1,6 +1,5 @@
 ---
 # NOTE: Footprint estimation should be run from root of project, so define paths relative to there
-# rois: [boa,mgd] # rois surveyed
 rois: [boa] # rois surveyed
 pop_rasters: # path to population raster for each roi
     - ./data/pop/boa_pop.tif
@@ -9,10 +8,10 @@ tile_dirs: # path to satellite imagery to use for building prediction for each r
     - ./maxar_boa/
 #     - ./maxar_mgd/
 survey_only: False
-model_dirs: # paths to Keras building footprint segmentation models (directory should contain model.json and model.h5)
+model_dirs: # paths to tensorflow building footprint segmentation models (directory should contain model.json and model.h5)
 #     - ./spacenet/models/model_1_old/
 #     - ./spacenet/models/model_1/
 #     - ./spacesur/dataset_2/models/model_1/
     - ./spacesur/dataset_2/models/model_2/
-context_sizes: [3,5] # size of contexts to consider when predicting footprints (width of square around each survey tile to predict over)
+context_sizes: [3,5] # size of contexts to consider when predicting footprints (widths of square around each survey tile to predict over)
 ...

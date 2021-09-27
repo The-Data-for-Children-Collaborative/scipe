@@ -250,6 +250,6 @@ def preprocess_data(params):
     print("done")
 
     # compute building footprint area
-    print("Calculating footprint area... ", end="")
+    print("Calculating footprint area... ")
     process_footprints(footprint_dirs, model_names, thresholds, pop_rasters, rois, out_dir)
     print("done")

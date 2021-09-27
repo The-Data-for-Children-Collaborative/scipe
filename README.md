@@ -17,3 +17,6 @@ Executing `run_pipeline.py` yields the following results for the example [`pipel
 
 ## Data
 Data required to run the pipeline can be downloaded from [TBC].
+
+## TODO:
+Add foresci as pip dependency for conda env
