@@ -63,7 +63,7 @@ embedding:
 #         - ./csv/embeddings/resnet_nosplit_15_5.csv
 #         - ./csv/embeddings/barlow_nosplit_15_5.csv
     rois: [boa,mgd]
-    tiles_path: ./survey_tiles/
+    tiles_path: ./survey_tiles/ # TODO: detail structure of directory
     finetuning:
         run: True # whether to fine tune models
         batch_size: 32 # batch size for training
