@@ -57,6 +57,7 @@ embedding:
 #         - vgg16
 #         - deepcluster
 #         - barlow
+    # TODO: run precomputed option
 #     precomputed: # precomputed tile embeddings to add to dataset
 #         - ./csv/embeddings/swav_nosplit_15_5.csv
 #         - ./csv/embeddings/deepcluster_nosplit_15_5.csv
