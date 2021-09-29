@@ -71,7 +71,6 @@ def cross_val(reg_master, df, features, target, return_models=True, log=False):
         print("No folds specified in dataframe")
         return
 
-    print(features)
     y_pred = []
     y_var = []
     models = []
@@ -230,14 +229,28 @@ def run_experiments(df_master, cvs, model_names, logs, features_list, out_dir_li
 # def get_features(csv_path):  # TODO: appears to be redundant
 #     return np.loadtxt(csv_path, delimiter=',')
 
+def expand_features(feature_sets, cols):
+    """ Expand features of form <prefix>_# to cover all columns in cols where # represents a number. """
+    for i in range(len(feature_sets)):
+        for j in range(len(feature_sets[i])):
+            if feature_sets[i][j].endswith('_#'):
+                prefix = feature_sets[i][j][:-1]  # get suffix without number placeholder
+                matching_features = [c for c in cols if c.startswith(prefix) and c[len(prefix):].isnumeric()]
+                feature_sets[i].pop(j)
+                feature_sets[i] += matching_features
+    return feature_sets
+
+
 def run_predictions(df, params, prng):
     """ Run experiments described in params over dataset df. """
     model_names = params['models']
     cvs = [get_model(model, prng) for model in model_names]
     logs = params['log']
-    feature_sets = [np.loadtxt(f, dtype=str) for f in params['feature_sets']]
+    feature_sets = [list(np.loadtxt(f, dtype=str, ndmin=1, comments=None)) for f in params['feature_sets']]
+    feature_sets = expand_features(feature_sets, list(df.columns))
     if params['show_roi']:
-        feature_sets = [np.append(f, 'roi_num') for f in feature_sets]
+        feature_sets = [f.append('roi_num') for f in feature_sets]
+    feature_sets = np.array(feature_sets)
     experiment_dir = params['experiment_dir']
     if not os.path.exists(experiment_dir):
         os.makedirs(experiment_dir)

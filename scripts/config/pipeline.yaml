@@ -66,7 +66,7 @@ embedding:
     rois: [boa,mgd]
     tiles_path: ./survey_tiles/ # TODO: detail structure of directory
     finetuning:
-        run: True # whether to fine tune models
+        run: False # whether to fine tune models
         batch_size: 32 # batch size for training
         frozen_epochs: 1 # numer of epochs to train head of model for with encoder frozen
         epochs: 0 # numer of epochs to train full model for with discriminative learning rate
@@ -76,7 +76,8 @@ embedding:
 # Population prediction parameters
 prediction:
     run: True
-    feature_sets: # sets of features to run experiments with (csv file holding dataframe column names)
+    feature_sets: # sets of features to run experiments with (csv file holding dataframe column names,
+                  # or <str>_#, which corresponds to column names where # is replaced with a number)
 #         - ./scripts/config/features/public.csv
 #         - ./scripts/config/features/spacesur_only.csv
 #         - ./scripts/config/features/public_spacesur.csv
