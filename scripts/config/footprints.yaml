@@ -7,7 +7,7 @@ pop_rasters: # path to population raster for each roi
 tile_dirs: # path to satellite imagery to use for building prediction for each roi
     - ./maxar_boa/
 #     - ./maxar_mgd/
-survey_only: False
+survey_only: False # whether to estimate for whole roi or only survey tiles + contexts
 model_dirs: # paths to tensorflow building footprint segmentation models (directory should contain model.json and model.h5)
 #     - ./spacenet/models/model_1_old/
 #     - ./spacenet/models/model_1/
