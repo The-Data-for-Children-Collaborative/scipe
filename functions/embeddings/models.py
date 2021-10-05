@@ -9,6 +9,8 @@ from collections import OrderedDict
 from torch.autograd import Variable
 from torchvision import transforms
 
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
 deepcluster_path = './representation/deepcluster/deepclusterv2_800ep_pretrain.pth.tar'
 """ str: Path to deepcluster model weights. """
 
@@ -18,7 +20,7 @@ def get_swav():
     SwAV, and preprocessing is a function that preprocesses a PIL image. """
     model = torch.hub.load('facebookresearch/swav', 'resnet50')
     model.fc = torch.nn.Identity()  # remove fully connected portion of model
-    model.cuda()
+    model = model.to(device)
     model.eval()
     return model, preprocess_imagenet
 
@@ -28,7 +30,7 @@ def get_barlow():
         Barlow Twins, and preprocessing is a function that preprocesses a PIL image. """
     model = torch.hub.load('facebookresearch/barlowtwins:main', 'resnet50')
     model.fc = torch.nn.Identity()
-    model.cuda()
+    model = model.to(device)
     model.eval()
     return model, preprocess_imagenet
 
@@ -38,7 +40,7 @@ def get_inception():
     and preprocessing is a function that preprocesses a PIL image. """
     model = torchvision.models.inception_v3(pretrained=True)
     model.fc = torch.nn.Identity()  # remove fully connected portion of model
-    model.cuda()
+    model = model.to(device)
     model.eval()
     return model, preprocess_imagenet
 
@@ -48,7 +50,7 @@ def get_densenet():
         and preprocessing is a function that preprocesses a PIL image. """
     model = torchvision.models.densenet161(pretrained=True)
     model.classifier = torch.nn.Identity()  # remove fully connected portion of model
-    model.cuda()
+    model = model.to(device)
     model.eval()
     return model, preprocess_imagenet
 
@@ -58,7 +60,7 @@ def get_resnet():
         and preprocessing is a function that preprocesses a PIL image. """
     model = torchvision.models.resnet50(pretrained=True)
     model.fc = torch.nn.Identity()  # remove fully connected portion of model
-    model.cuda()
+    model = model.to(device)
     model.eval()
     return model, preprocess_imagenet
 
@@ -69,7 +71,7 @@ def get_vgg16():
     model = torchvision.models.vgg16_bn(pretrained=True)
     model.avgpool = torch.nn.AdaptiveAvgPool2d(output_size=(1, 1))  # modify average pooling to return feature vector
     model.classifier = torch.nn.Identity()  # remove fully connected portion of model
-    model.cuda()
+    model = model.to(device)
     model.eval()
     return model, preprocess_imagenet
 
@@ -87,7 +89,7 @@ def get_deepcluster():
             checkpoint[name] = v
     model.load_state_dict(checkpoint)
     model.eval()
-    model.cuda()
+    model = model.to(device)
     return model, preprocess_imagenet
 
 
@@ -118,5 +120,5 @@ def preprocess_imagenet(tile):
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
-    tile = Variable(pre(tile).unsqueeze(0)).cuda()
+    tile = Variable(pre(tile).unsqueeze(0)).to(device)
     return tile

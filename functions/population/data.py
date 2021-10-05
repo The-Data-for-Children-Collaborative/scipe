@@ -170,4 +170,5 @@ def build_dataset(params, survey_only=True):
         df = df.sort_values(by='fold', ascending=True)
     df['roi'] = pd.Categorical(df['roi'])  # set to categorical to allow codes
     df['roi_num'] = df['roi'].cat.codes  # codes that can be used in modelling
-    return df.reset_index(drop=True)
+    df = df.reset_index(drop=True)
+    return df

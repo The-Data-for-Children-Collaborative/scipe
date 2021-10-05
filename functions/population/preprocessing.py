@@ -216,11 +216,11 @@ def preprocess_data(params):
     pop_rasters = params['pop_rasters']
     landcover = params['landcover']
     landsat = params['landsat']
-    roads = params['roads']
+    roads = params['roads']  # TODO: unused as of yet
     footprint_dirs = params['footprint_dirs']
     model_names = params['model_names']
     thresholds = params['thresholds']
-    indices = params['indices']
+    indices = params['landsat_indices']
 
     # initialize directories
     if not os.path.exists(out_dir):

@@ -7,7 +7,7 @@ from embeddings.prediction import embed_tile_torch
 from PIL import Image, ImageOps
 
 SEED = 42
-""" Seed to control randomness. """
+""" int: Seed to control randomness. """
 np.random.seed(SEED)
 prng = np.random.RandomState(SEED)
 """ np.random.RandomState: Numpy random state based on SEED. """

@@ -16,7 +16,7 @@ sys.path.append(os.path.abspath('./functions/'))  # assumes running from parent 
 from population.preprocessing import preprocess_data
 from population.data import build_dataset
 from population.prediction import run_predictions, run_estimation
-from embeddings.prediction import run_embeddings
+from embeddings.prediction import run_embeddings, append_precomputed
 
 SEED = 42
 np.random.seed(SEED)
@@ -36,9 +36,20 @@ if __name__ == "__main__":
         df = build_dataset(params['dataset'])
 
         if params['embedding']['run'] or (params['estimation']['run'] and params['estimation']['embed']):
-            df = run_embeddings(df, params['embedding'], 'zero_label_paths' not in params['dataset'], SEED)
+            df = run_embeddings(df, params['embedding'], SEED)
         else:
-            print("Skipping embeddings")
+            print("Skipping running embeddings")
+        if params['embedding']['append_precomputed']:
+            print('Appending precomputed embeddings... ', end='')
+            precomputed = params['embedding']['precomputed']
+            append_precomputed(df, precomputed, 'zero_label_paths' not in params['dataset'])
+            print('done.')
+
+        if params['dataset']['save_dataset']:
+            dir, _ = params['dataset']['dataset_path'].rsplit('.', 1)
+            if not os.path.exists(dir):
+                os.makedirs(dir)
+            df.to_csv(params['dataset']['dataset_path'])
 
         if params['prediction']['run']:
             run_predictions(df, params['prediction'], prng)

@@ -1,5 +1,6 @@
 ---
 # NOTE: Pipeline should be run from root of project, so define paths relative to there
+directory:
 # Preprocessing parameters
 preprocessing:
     run: False # set to True to rerun preprocessing according to specification below
@@ -14,7 +15,7 @@ preprocessing:
         - average
         - nearest
         - max
-    indices: [ndvi,ndwi] # incides to compute using landsat data TODO: rename landsat_indices
+    landsat_indices: [ndvi,ndwi] # incides to compute using landsat data
     landcover: landcover.tif # name of copernicus landcover map, must appear in input_rasters
     landsat: landsat.tif # name of landsat raster, must appear in input_rasters
     roads: roads.tif # name of roads raster, must appear in input_rasters
@@ -44,7 +45,8 @@ dataset:
 #     zero_label_paths: # optional: paths to zero labels in addition to the survey
 #         - ./data/pop/boa_zero.pkl
 #         - ./data/pop/mgd_zero.pkl
-# TODO: add output csv path
+    save_dataset: True # whether to save dataset to disk
+    dataset_path: ./experiments/ft_pipeline/dataset.csv
 
 # Embedding parameters
 embedding:
@@ -57,21 +59,21 @@ embedding:
 #         - vgg16
 #         - deepcluster
 #         - barlow
-    # TODO: run precomputed option
-#     precomputed: # precomputed tile embeddings to add to dataset
-#         - ./csv/embeddings/swav_nosplit_15_5.csv
-#         - ./csv/embeddings/deepcluster_nosplit_15_5.csv
-#         - ./csv/embeddings/resnet_nosplit_15_5.csv
-#         - ./csv/embeddings/barlow_nosplit_15_5.csv
+    append_precomputed: False
+    precomputed: # precomputed tile embeddings to add to dataset
+         - ./csv/embeddings/swav_nosplit_15_5.csv
+         - ./csv/embeddings/deepcluster_nosplit_15_5.csv
+         - ./csv/embeddings/resnet_nosplit_15_5.csv
+         - ./csv/embeddings/barlow_nosplit_15_5.csv
     rois: [boa,mgd]
     tiles_path: ./survey_tiles/ # TODO: detail structure of directory
     finetuning:
-        run: False # whether to fine tune models
+        run: True # whether to fine tune models
         batch_size: 32 # batch size for training
         frozen_epochs: 1 # numer of epochs to train head of model for with encoder frozen
         epochs: 0 # numer of epochs to train full model for with discriminative learning rate
-        save_models: True # TODO
-        model_output: ''  # TODO
+        save_models: True # whether to save finetuned models to disk
+        models_dir: ./experiments/ft_pipeline/models/  # directory to save fintetuned models to
 
 # Population prediction parameters
 prediction:

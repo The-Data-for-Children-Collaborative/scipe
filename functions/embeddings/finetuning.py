@@ -1,4 +1,5 @@
 from fastai.vision.all import *
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
 def model_splitter(model):
@@ -23,7 +24,7 @@ def finetune(df_master, model_master, batch_size, epochs, frozen_epochs, input_s
     """
     def ft_subset(df):  # fine-tune the subset of the dataset contained in df
         model = deepcopy(model_master)
-        model.cuda()
+        model = model.to(device)
         model.train()
         dls = ImageDataLoaders.from_df(df,
                                        path='',
@@ -44,12 +45,12 @@ def finetune(df_master, model_master, batch_size, epochs, frozen_epochs, input_s
         model.cpu()
         return model
 
-    example = torch.Tensor(np.expand_dims(np.zeros((3, input_shape[0], input_shape[1])), 0)).cuda()
+    example = torch.Tensor(np.expand_dims(np.zeros((3, input_shape[0], input_shape[1])), 0)).to(device)
     dim = model_master(example).shape[1]  # get length of vector representation
     head = torch.nn.Linear(dim, 1)  # linear regression head for fine-tuning
     model_master = torch.nn.Sequential(model_master, head)
     trained_models = []
     for fold in range(df_master['fold'].max()+1):
         df_train = df_master[(df_master['fold'] != fold) & (df_master['pop'] >= 1) & (df_master['outlier'] == False)]
-        trained_models.append(ft_subset(df_train)[0])
+        trained_models.append(ft_subset(df_train))
     return trained_models

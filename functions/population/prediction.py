@@ -216,14 +216,11 @@ def run_experiments(df_master, cvs, model_names, logs, features_list, out_dir_li
                 plot_model(models[k], axarr_error[k], df, features, model_name, out_dir, plot_full)
             f_error.savefig(out_dir + 'prediction_error.pdf', bbox_inches='tight')
             f_error.savefig(out_dir + 'prediction_error.svg', bbox_inches='tight')
-            if include_outliers:
-                df.to_csv(os.path.join(out_dir_master, 'df_outliers.csv'))
-            else:
-                df.to_csv(os.path.join(out_dir_master, 'df.csv'))
+            df.to_csv(os.path.join(out_dir, 'estimates.csv'))
 
     df_results = pd.DataFrame(results)
-    with open(os.path.join(experiment_dir, 'table.tex'), 'w') as tf:
-        tf.write(df_results.to_latex())  # write table to file
+    with open(os.path.join(experiment_dir, 'table.tex'), 'w') as f:
+        f.write(df_results.to_latex())  # write table to file
 
 
 # def get_features(csv_path):  # TODO: appears to be redundant
