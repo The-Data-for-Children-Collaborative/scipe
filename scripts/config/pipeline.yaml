@@ -46,11 +46,11 @@ dataset:
 #         - ./data/pop/boa_zero.pkl
 #         - ./data/pop/mgd_zero.pkl
     save_dataset: True # whether to save dataset to disk
-    dataset_path: ./experiments/ft_pipeline/dataset.csv
+    dataset_path: ./experiments/test2/dataset.csv
 
 # Embedding parameters
 embedding:
-    run: True # whether to embed survey tiles
+    run: False # whether to embed survey tiles
     models: # choose from [swav,resnet,inception,vgg16,densenet,deepcluster,barlow]
         - swav
 #         - inception
@@ -59,21 +59,21 @@ embedding:
 #         - vgg16
 #         - deepcluster
 #         - barlow
-    append_precomputed: False
-    precomputed: # precomputed tile embeddings to add to dataset
-         - ./csv/embeddings/swav_nosplit_15_5.csv
-         - ./csv/embeddings/deepcluster_nosplit_15_5.csv
-         - ./csv/embeddings/resnet_nosplit_15_5.csv
-         - ./csv/embeddings/barlow_nosplit_15_5.csv
     rois: [boa,mgd]
     tiles_path: ./survey_tiles/ # TODO: detail structure of directory
     finetuning:
-        run: True # whether to fine tune models
+        run: False # whether to fine tune models
         batch_size: 32 # batch size for training
         frozen_epochs: 1 # numer of epochs to train head of model for with encoder frozen
         epochs: 0 # numer of epochs to train full model for with discriminative learning rate
         save_models: True # whether to save finetuned models to disk
-        models_dir: ./experiments/ft_pipeline/models/  # directory to save fintetuned models to
+        models_dir: ./experiments/test2/models/  # directory to save fintetuned models to
+    append_precomputed: True
+    precomputed: # precomputed tile embeddings to add to dataset
+        - ./csv/embeddings/swav_nosplit_15_5.csv
+        - ./csv/embeddings/deepcluster_nosplit_15_5.csv
+        - ./csv/embeddings/resnet_nosplit_15_5.csv
+        - ./csv/embeddings/barlow_nosplit_15_5.csv
 
 # Population prediction parameters
 prediction:
@@ -91,7 +91,7 @@ prediction:
 #         - ./scripts/config/features/resnet.csv
 #         - ./scripts/config/features/densenet.csv
 #         - ./scripts/config/features/vgg16.csv
-    experiment_dir: ./experiments/ft_pipeline/ # where to output experiment results
+    experiment_dir: ./experiments/test2/ # where to output experiment results
     models: # models to run experiments with, choose from [lasso, rf, poisson, dummy]
          - lasso
 #        - rf

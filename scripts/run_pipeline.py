@@ -42,7 +42,7 @@ if __name__ == "__main__":
         if params['embedding']['append_precomputed']:
             print('Appending precomputed embeddings... ', end='')
             precomputed = params['embedding']['precomputed']
-            append_precomputed(df, precomputed, 'zero_label_paths' not in params['dataset'])
+            df = append_precomputed(df, precomputed, 'zero_label_paths' not in params['dataset'])
             print('done.')
 
         if params['dataset']['save_dataset']:
