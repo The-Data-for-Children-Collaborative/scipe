@@ -12,6 +12,11 @@
 Module Contents
 ---------------
 
+.. data:: device
+   
+
+   
+
 .. data:: deepcluster_path
    :annotation: = ./representation/deepcluster/deepclusterv2_800ep_pretrain.pth.tar
 

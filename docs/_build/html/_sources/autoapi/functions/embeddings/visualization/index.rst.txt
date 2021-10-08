@@ -12,6 +12,8 @@ Module Contents
 
    Seed to control randomness.
 
+   :type: int
+
 
 .. data:: prng
    

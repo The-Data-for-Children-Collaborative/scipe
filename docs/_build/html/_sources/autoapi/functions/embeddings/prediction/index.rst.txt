@@ -19,6 +19,11 @@ Module Contents
 
    
 
+.. data:: device
+   
+
+   
+
 .. function:: embed_tile_torch(tile, model)
 
    Embed prepared tile using torch model.
@@ -34,8 +39,22 @@ Module Contents
 
 .. function:: embed_survey_tiles_folds(df, models, model_name, preprocessing)
 
+   Embed survey tiles in df using one torch torch model for each fold, with preprocessing function applied.
 
-.. function:: run_embeddings(df, params, rm_zero, seed)
+
+.. function:: append_precomputed(df, precomputed, rm_zero)
+
+   Append precomputed embeddings to dataset.
+
+   :param df: Dataframe to append precomputed embeddings to.
+   :param precomputed: List of paths to precomputed embeddings (csv format).
+   :param rm_zero: Whether to remove zero population tiles from dataset when merging precomputed results.
+   :type rm_zero: bool
+
+   :returns: Dataframe with precomputed embeddings appended.
+
+
+.. function:: run_embeddings(df, params, seed)
 
    Run and save embeddings to df. Optionally append precomputed embeddings from disk.
 
@@ -43,8 +62,8 @@ Module Contents
    :type df: pd.DataFrame
    :param params: Parameters for embeddings, including models to run etc.
    :type params: dict
-   :param rm_zero: Whether to remove zero population tiles from dataset when merging precomputed results.
-   :type rm_zero: bool
+   :param seed: seed for finetuning (train/test split).
+   :type seed: int
 
    :returns: Dataframe with tile embeddings for each row and model.
    :rtype: pd.DataFrame

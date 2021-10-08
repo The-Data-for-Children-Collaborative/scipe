@@ -180,6 +180,10 @@
 <dt id="functions.embeddings.prediction.chained_assignment">
 <code class="sig-prename descclassname"><span class="pre">functions.embeddings.prediction.</span></code><code class="sig-name descname"><span class="pre">chained_assignment</span></code><a class="headerlink" href="#functions.embeddings.prediction.chained_assignment" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+<dl class="py data">
+<dt id="functions.embeddings.prediction.device">
+<code class="sig-prename descclassname"><span class="pre">functions.embeddings.prediction.</span></code><code class="sig-name descname"><span class="pre">device</span></code><a class="headerlink" href="#functions.embeddings.prediction.device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py function">
 <dt id="functions.embeddings.prediction.embed_tile_torch">
 <code class="sig-prename descclassname"><span class="pre">functions.embeddings.prediction.</span></code><code class="sig-name descname"><span class="pre">embed_tile_torch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.embeddings.prediction.embed_tile_torch" title="Permalink to this definition">¶</a></dt>
@@ -197,17 +201,35 @@
 <dl class="py function">
 <dt id="functions.embeddings.prediction.embed_survey_tiles_folds">
 <code class="sig-prename descclassname"><span class="pre">functions.embeddings.prediction.</span></code><code class="sig-name descname"><span class="pre">embed_survey_tiles_folds</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocessing</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.embeddings.prediction.embed_survey_tiles_folds" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Embed survey tiles in df using one torch torch model for each fold, with preprocessing function applied.</p>
+</dd></dl>
+<dl class="py function">
+<dt id="functions.embeddings.prediction.append_precomputed">
+<code class="sig-prename descclassname"><span class="pre">functions.embeddings.prediction.</span></code><code class="sig-name descname"><span class="pre">append_precomputed</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precomputed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rm_zero</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.embeddings.prediction.append_precomputed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append precomputed embeddings to dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – Dataframe to append precomputed embeddings to.</p></li>
+<li><p><strong>precomputed</strong> – List of paths to precomputed embeddings (csv format).</p></li>
+<li><p><strong>rm_zero</strong> (<em>bool</em>) – Whether to remove zero population tiles from dataset when merging precomputed results.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dataframe with precomputed embeddings appended.</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py function">
 <dt id="functions.embeddings.prediction.run_embeddings">
-<code class="sig-prename descclassname"><span class="pre">functions.embeddings.prediction.</span></code><code class="sig-name descname"><span class="pre">run_embeddings</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rm_zero</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.embeddings.prediction.run_embeddings" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">functions.embeddings.prediction.</span></code><code class="sig-name descname"><span class="pre">run_embeddings</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#functions.embeddings.prediction.run_embeddings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run and save embeddings to df. Optionally append precomputed embeddings from disk.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>pd.DataFrame</em>) – Dataframe to run embeddings over.</p></li>
 <li><p><strong>params</strong> (<em>dict</em>) – Parameters for embeddings, including models to run etc.</p></li>
-<li><p><strong>rm_zero</strong> (<em>bool</em>) – Whether to remove zero population tiles from dataset when merging precomputed results.</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – seed for finetuning (train/test split).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -260,10 +282,12 @@
 <li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functions.embeddings.prediction</span></code></a><ul>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
 <li><a class="reference internal" href="#functions.embeddings.prediction.chained_assignment">chained_assignment</a></li>
+<li><a class="reference internal" href="#functions.embeddings.prediction.device">device</a></li>
 <li><a class="reference internal" href="#functions.embeddings.prediction.embed_tile_torch">embed_tile_torch</a></li>
 <li><a class="reference internal" href="#functions.embeddings.prediction.append_file_name">append_file_name</a></li>
 <li><a class="reference internal" href="#functions.embeddings.prediction.embed_survey_tiles">embed_survey_tiles</a></li>
 <li><a class="reference internal" href="#functions.embeddings.prediction.embed_survey_tiles_folds">embed_survey_tiles_folds</a></li>
+<li><a class="reference internal" href="#functions.embeddings.prediction.append_precomputed">append_precomputed</a></li>
 <li><a class="reference internal" href="#functions.embeddings.prediction.run_embeddings">run_embeddings</a></li>
 </ul>
 </li>
