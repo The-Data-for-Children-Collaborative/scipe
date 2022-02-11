@@ -12,7 +12,8 @@ from shutil import copyfile
 from matplotlib import pyplot as plt
 
 from joblib import parallel_backend
-sys.path.append(os.path.abspath('./functions/'))  # assumes running from parent directory
+# Assumes running from parent directory.
+sys.path.append(os.path.abspath('./functions/'))
 from population.preprocessing import preprocess_data
 from population.data import build_dataset
 from population.prediction import run_predictions, run_estimation
@@ -35,14 +36,16 @@ if __name__ == "__main__":
 
         df = build_dataset(params['dataset'])
 
-        if params['embedding']['run'] or (params['estimation']['run'] and params['estimation']['embed']):
+        if params['embedding']['run'] or (
+                params['estimation']['run'] and params['estimation']['embed']):
             df = run_embeddings(df, params['embedding'], SEED)
         else:
             print("Skipping running embeddings")
         if params['embedding']['append_precomputed']:
             print('Appending precomputed embeddings... ', end='')
             precomputed = params['embedding']['precomputed']
-            df = append_precomputed(df, precomputed, 'zero_label_paths' not in params['dataset'])
+            df = append_precomputed(
+                df, precomputed, 'zero_label_paths' not in params['dataset'])
             print('done.')
 
         if params['dataset']['save_dataset']:
@@ -58,14 +61,17 @@ if __name__ == "__main__":
 
         if params['estimation']['run']:
             params_dataset = params['dataset'].copy()
+            # May not want to predict over all rois from modelling stage.
             params_dataset['rois'] = params['estimation'][
-                'rois']  # may not want to predict over all rois from modelling stage
+                'rois']
             df_full = build_dataset(params_dataset, survey_only=False)
-            if params['estimation']['embed']:  # rerun same embeddings from experiments on full dataset
+            # Rerun same embeddings from experiments on full dataset.
+            if params['estimation']['embed']:
                 df_full = run_embeddings(df_full, params['embedding'])
             run_estimation(df, df_full, params['estimation'], prng)
 
         exp_dir = params['prediction']['experiment_dir']
         src = sys.argv[1]
         dst = os.path.join(exp_dir, os.path.basename(src))
-        copyfile(src, dst)  # copy params to experiment dir
+        # Copy params to experiment dir.
+        copyfile(src, dst)

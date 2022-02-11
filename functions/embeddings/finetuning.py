@@ -1,5 +1,5 @@
 from fastai.vision.all import *
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+_device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
 def model_splitter(model):
@@ -7,50 +7,62 @@ def model_splitter(model):
     return [params(m) for m in model[0]._modules.values()] + [params(model[1])]
 
 
-def finetune(df_master, model_master, batch_size, epochs, frozen_epochs, input_shape=(224, 224), seed=42):
+def finetune(df_master, model_master, batch_size, epochs, frozen_epochs,
+             input_shape=(224, 224), seed=42):
     """
     Args:
-        df_master (pd.DataFrame): dataframe containing data for all folds to train on
+        df_master (pd.DataFrame): dataframe containing data for all folds to
+            train on
         model_master (torch.nn.Module): model to fine-tune.
         batch_size (int): batch size for training.
         epochs (int): number of epochs to train full model with.
-        frozen_epochs (int): number of epochs to initially train regression head for with frozen encoder.
-        input_shape ((int,int)): shape of images input to model, assumes ImageNet size.
+        frozen_epochs (int): number of epochs to initially train regression head
+            for with frozen encoder.
+        input_shape ((int,int)): shape of images input to model, assumes
+            ImageNet size.
         seed (int): seed for data split.
 
     Returns:
-        (:obj:`list` of :obj:`torch.nn.Module`): k trained PyTorch models, where k is the number of cross validation folds.
+        (:obj:`list` of :obj:`torch.nn.Module`): k trained PyTorch models, where
+            k is the number of cross validation folds.
 
     """
     def ft_subset(df):  # fine-tune the subset of the dataset contained in df
         model = deepcopy(model_master)
-        model = model.to(device)
+        model = model.to(_device)
         model.train()
         dls = ImageDataLoaders.from_df(df,
-                                       path='',
-                                       fn_col=df.columns.get_loc('file_name'),
-                                       label_col=df.columns.get_loc('pop'),
-                                       y_block=RegressionBlock,
-                                       valid_pct=0.2,
-                                       seed=seed,
-                                       bs=batch_size,
-                                       item_tfms=[Resize(input_shape), DihedralItem(p=1.0)],
-                                       batch_tfms=[Normalize.from_stats(*imagenet_stats)],
-                                       num_workers=0
-                                       )
-        learn = Learner(dls, model, loss_func=MSELossFlat(), opt_func=Adam, metrics=[mae], splitter=model_splitter)
-        learn.fine_tune(epochs, freeze_epochs=frozen_epochs,
-                        cbs=EarlyStoppingCallback(monitor='valid_loss', patience=2))
+            path='',
+            fn_col=df.columns.get_loc('file_name'),
+            label_col=df.columns.get_loc('pop'),
+            y_block=RegressionBlock,
+            valid_pct=0.2,
+            seed=seed,
+            bs=batch_size,
+            item_tfms=[Resize(input_shape), DihedralItem(p=1.0)],
+            batch_tfms=[Normalize.from_stats(*imagenet_stats)],
+            num_workers=0
+            )
+        learn = Learner(dls, model, loss_func=MSELossFlat(), opt_func=Adam,
+                        metrics=[mae], splitter=model_splitter)
+        learn.fine_tune(
+            epochs, freeze_epochs=frozen_epochs,
+            cbs=EarlyStoppingCallback(monitor='valid_loss', patience=2))
         model.eval()
         model.cpu()
         return model
 
-    example = torch.Tensor(np.expand_dims(np.zeros((3, input_shape[0], input_shape[1])), 0)).to(device)
-    dim = model_master(example).shape[1]  # get length of vector representation
-    head = torch.nn.Linear(dim, 1)  # linear regression head for fine-tuning
+    example = np.expand_dims(np.zeros((3, input_shape[0], input_shape[1])), 0)
+    example = torch.Tensor(example).to(_device)
+    # Get length of vector representation.
+    dim = model_master(example).shape[1]
+    # Linear regression head for fine-tuning.
+    head = torch.nn.Linear(dim, 1)
     model_master = torch.nn.Sequential(model_master, head)
     trained_models = []
     for fold in range(df_master['fold'].max()+1):
-        df_train = df_master[(df_master['fold'] != fold) & (df_master['pop'] >= 1) & (df_master['outlier'] == False)]
+        df_train = df_master[
+            (df_master['fold'] != fold) & (df_master['pop'] >= 1) &
+            (df_master['outlier'] == False)]
         trained_models.append(ft_subset(df_train))
     return trained_models

@@ -3,11 +3,10 @@ Module containing models used to embed remote sensing tiles.
 """
 
 import torch
+from torch import autograd
 import torchvision
-from collections import OrderedDict
-
-from torch.autograd import Variable
 from torchvision import transforms
+import collections
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -16,8 +15,9 @@ deepcluster_path = './representation/deepcluster/deepclusterv2_800ep_pretrain.pt
 
 
 def get_swav():
-    """ Returns (model,preprocessing) pair, where model is a PyTorch ResNet50 model pretrained on ImageNet using
-    SwAV, and preprocessing is a function that preprocesses a PIL image. """
+    """ Returns (model,preprocessing) pair, where model is a PyTorch ResNet50
+    model pretrained on ImageNet using SwAV, and preprocessing is a function
+    that preprocesses a PIL image. """
     model = torch.hub.load('facebookresearch/swav', 'resnet50')
     model.fc = torch.nn.Identity()  # remove fully connected portion of model
     model = model.to(device)
@@ -26,8 +26,9 @@ def get_swav():
 
 
 def get_barlow():
-    """ Returns (model,preprocessing) pair, where model is a PyTorch ResNet50 model pretrained on ImageNet using
-        Barlow Twins, and preprocessing is a function that preprocesses a PIL image. """
+    """ Returns (model,preprocessing) pair, where model is a PyTorch ResNet50
+        model pretrained on ImageNet using Barlow Twins, and preprocessing is a
+        function that preprocesses a PIL image. """
     model = torch.hub.load('facebookresearch/barlowtwins:main', 'resnet50')
     model.fc = torch.nn.Identity()
     model = model.to(device)
@@ -36,56 +37,68 @@ def get_barlow():
 
 
 def get_inception():
-    """ Returns (model,preprocessing) pair, where model is a PyTorch inceptionV3 model pretrained on ImageNet,
-    and preprocessing is a function that preprocesses a PIL image. """
+    """ Returns (model,preprocessing) pair, where model is a PyTorch inceptionV3
+    model pretrained on ImageNet, and preprocessing is a function that
+    preprocesses a PIL image. """
     model = torchvision.models.inception_v3(pretrained=True)
-    model.fc = torch.nn.Identity()  # remove fully connected portion of model
+    # Remove fully connected portion of model.
+    model.fc = torch.nn.Identity()
     model = model.to(device)
     model.eval()
     return model, preprocess_imagenet
 
 
 def get_densenet():
-    """ Returns (model,preprocessing) pair, where model is a PyTorch DenseNet161 model pretrained on ImageNet,
-        and preprocessing is a function that preprocesses a PIL image. """
+    """ Returns (model,preprocessing) pair, where model is a PyTorch DenseNet161
+        model pretrained on ImageNet, and preprocessing is a function that
+        preprocesses a PIL image. """
     model = torchvision.models.densenet161(pretrained=True)
-    model.classifier = torch.nn.Identity()  # remove fully connected portion of model
+    # Remove fully connected portion of model.
+    model.classifier = torch.nn.Identity()
     model = model.to(device)
     model.eval()
     return model, preprocess_imagenet
 
 
 def get_resnet():
-    """ Returns (model,preprocessing) pair, where model is a PyTorch ResNet50 model pretrained on ImageNet,
-        and preprocessing is a function that preprocesses a PIL image. """
+    """ Returns (model,preprocessing) pair, where model is a PyTorch ResNet50
+        model pretrained on ImageNet, and preprocessing is a function that
+        preprocesses a PIL image. """
     model = torchvision.models.resnet50(pretrained=True)
-    model.fc = torch.nn.Identity()  # remove fully connected portion of model
+    # Remove fully connected portion of model.
+    model.fc = torch.nn.Identity()
     model = model.to(device)
     model.eval()
     return model, preprocess_imagenet
 
 
 def get_vgg16():
-    """ Returns (model,preprocessing) pair, where model is a PyTorch VGG16 model pretrained on ImageNet,
-        and preprocessing is a function that preprocesses a PIL image. """
+    """ Returns (model,preprocessing) pair, where model is a PyTorch VGG16 model
+        pretrained on ImageNet, and preprocessing is a function that
+        preprocesses a PIL image. """
     model = torchvision.models.vgg16_bn(pretrained=True)
-    model.avgpool = torch.nn.AdaptiveAvgPool2d(output_size=(1, 1))  # modify average pooling to return feature vector
-    model.classifier = torch.nn.Identity()  # remove fully connected portion of model
+    # Modify average pooling to return feature vector.
+    model.avgpool = torch.nn.AdaptiveAvgPool2d(output_size=(1, 1))
+    # Remove fully connected portion of model.
+    model.classifier = torch.nn.Identity()
     model = model.to(device)
     model.eval()
     return model, preprocess_imagenet
 
 
 def get_deepcluster():
-    """ Returns (model,preprocessing) pair, where model is a PyTorch ResNet50 model pretrained on ImageNet using
-    DeepCluster, and preprocessing is a function that preprocesses a PIL image. """
+    """ Returns (model,preprocessing) pair, where model is a PyTorch ResNet50
+    model pretrained on ImageNet using DeepCluster, and preprocessing is a
+    function that preprocesses a PIL image. """
     model = torchvision.models.resnet50(pretrained=False)
     model.fc = torch.nn.Identity()
     old_checkpoint = torch.load(deepcluster_path)
-    checkpoint = OrderedDict()
+    checkpoint = collections.OrderedDict()
     for k, v in old_checkpoint.items():
-        if 'projection_head' not in k and 'prototypes' not in k:  # ignore projection head params
-            name = k[7:]  # make checkpoint param names match model param names
+        # Ignore projection head params.
+        if 'projection_head' not in k and 'prototypes' not in k:
+            # Make checkpoint param names match model param names.
+            name = k[7:]
             checkpoint[name] = v
     model.load_state_dict(checkpoint)
     model.eval()
@@ -115,10 +128,11 @@ def get_model(model_name):
 
 def preprocess_imagenet(tile):
     """ Return tile preprocess for imagenet model. """
-    pre = transforms.Compose([  # from resnet torch hub docs
+    pre = transforms.Compose([
         transforms.Resize((224, 244)),
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        transforms.Normalize(
+            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
-    tile = Variable(pre(tile).unsqueeze(0)).to(device)
+    tile = autograd.Variable(pre(tile).unsqueeze(0)).to(device)
     return tile

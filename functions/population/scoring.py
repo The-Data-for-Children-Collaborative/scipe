@@ -3,7 +3,7 @@ Module containing scoring functions for population models.
 """
 
 import numpy as np
-from sklearn.metrics import accuracy_score
+from sklearn import metrics
 
 
 def to_categorical(ys, bands):
@@ -24,7 +24,7 @@ def accuracy(y_true, y_pred, bands):
     """ Categorize data then then return accuracy """
     y_true = to_categorical(y_true, bands)
     y_pred = to_categorical(y_pred, bands)
-    return accuracy_score(y_true, y_pred)
+    return metrics.accuracy_score(y_true, y_pred)
 
 
 def meape(y_true, y_pred):

@@ -22,9 +22,11 @@ def plot_folds(df, figsize=(4.5, 9), bbox=(1.75, 1)):
     f, ax = plt.subplots(figsize=figsize)
     for fold in range(4):
         if fold == 3:
-            ax.scatter(xs_folds[fold], ys_folds[fold], s=15, marker='s', c='purple', alpha=0.4, label=f'Fold {fold}')
+            ax.scatter(xs_folds[fold], ys_folds[fold], s=15, marker='s',
+                       c='purple', alpha=0.4, label=f'Fold {fold}')
         else:
-            ax.scatter(xs_folds[fold], ys_folds[fold], s=15, marker='s', alpha=0.4, label=f'Fold {fold}')
+            ax.scatter(xs_folds[fold], ys_folds[fold], s=15, marker='s',
+                       alpha=0.4, label=f'Fold {fold}')
     ax.invert_yaxis()
     ax.axis('scaled')
     ax.legend(loc='upper right', bbox_to_anchor=bbox)
@@ -35,7 +37,8 @@ def plot_folds(df, figsize=(4.5, 9), bbox=(1.75, 1)):
 
 
 def get_tiles(x, y, roi, tiles_path):
-    """ Return (img,buildings) pair of numpy arrays for roi survey tile (y,x). """
+    """ Return (img,buildings) pair of numpy arrays for roi survey tile
+        (y,x). """
     img = imread(f'{tiles_path}{roi}/images/{y}_{x}.tif')
     buildings = imread(f'{tiles_path}{roi}/buildings/{y}_{x}.tif')
     return img, buildings
@@ -49,55 +52,66 @@ def get_tiles_df(df, i, tiles_path):
     return get_tiles(x, y, roi, tiles_path)
 
 
-def prediction_error(df, true='pop', pred='pop_pred', var=None, ax=None, images=False, buildings=False, tiles_path=None,
-                     color=True, show_metrics=False, lim=None):
-    """ Plot predicted (df[pred]) vs observed (df[true]) values from dataframe, optionally plot error bars (var =
-    True) and tile images/buildings over points. """
-    # initialize plot and axis
+def prediction_error(df, true='pop', pred='pop_pred', var=None, ax=None,
+                     images=False, buildings=False, tiles_path=None, color=True,
+                    show_metrics=False, lim=None):
+    """ Plot predicted (df[pred]) vs observed (df[true]) values from dataframe,
+        optionally plot error bars (var = True) and tile images/buildings over
+        points. """
+    # Initialize plot and axis.
     if not ax:
         f, ax = plt.subplots(figsize=(4, 4))
-    # read prediction/truth
+    # Read prediction/truth.
     y_true = df[true]
     y_pred = df[pred]
-    # plot data
+    # Plot data.
     if not (images or buildings):
         if color:
             for i, roi in enumerate(sorted(df['roi'].unique())):
                 df_roi = df[df['roi'] == roi]
                 if var:
-                    ax.errorbar(df_roi[true], df_roi[pred], yerr=df_roi[var], capsize=0, alpha=0.3, linestyle='None')
-                    ax.scatter(df_roi[true], df_roi[pred], alpha=0.5, label=roi.upper(), s=25)
+                    ax.errorbar(df_roi[true], df_roi[pred], yerr=df_roi[var],
+                                capsize=0, alpha=0.3, linestyle='None')
+                    ax.scatter(df_roi[true], df_roi[pred], alpha=0.5,
+                               label=roi.upper(), s=25)
                 else:
-                    ax.scatter(df_roi[true], df_roi[pred], alpha=0.75, label=roi.upper(), s=25)
+                    ax.scatter(df_roi[true], df_roi[pred], alpha=0.75,
+                               label=roi.upper(), s=25)
 
-    # set the axes limits based on the range of X and Y data
+    # Set the axes limits based on the range of X and Y data.
     ax.set_xlim(y_true.min() - 1, y_true.max() + 1)
     ax.set_ylim(y_pred.min() - 1, y_pred.max() + 1)
 
-    # square the axes to ensure a 45 degree line
+    # Square the axes to ensure a 45 degree line.
     ylim = ax.get_ylim()
     xlim = ax.get_xlim()
 
-    # find the range that captures all data
+    # Find the range that captures all data.
     bounds = (min(ylim[0], xlim[0]), max(ylim[1], xlim[1]))
 
-    # reset the limits
+    # Reset the limits.
     if lim:
         bounds = lim
     ax.set_xlim(bounds)
     ax.set_ylim(bounds)
 
-    # ensure the aspect ratio is square
+    # Ensure the aspect ratio is square.
     ax.set_aspect("equal", adjustable="box")
 
     m, b = np.polyfit(y_true, y_pred, 1)
-    ax.plot(bounds, m * np.array(bounds) + b, 'k--', label='best fit', linewidth=2)
+    ax.plot(bounds, m * np.array(bounds) + b, 'k--', label='best fit',
+            linewidth=2)
 
     # draw the 45 degree line
-    plt.plot(bounds, bounds, '--', alpha=0.5, label='identity', color='#111111', linewidth=2)
+    plt.plot(
+        bounds, bounds, '--', alpha=0.5, label='identity', color='#111111',
+        linewidth=2)
 
     if show_metrics:
-        label = f"$R^2 = {r2_score(y_true, y_pred):0.3f}$\n$MeAPE = {meape(y_true, y_pred):0.3f}$\n$aMeAPE = {ameape(y_true, y_pred):0.3f}$\n$MeAE = {median_absolute_error(y_true, y_pred):0.2f}$"
+        label = (f'$R^2 = {r2_score(y_true, y_pred):0.3f}$\n$MeAPE = '
+                 f'{meape(y_true, y_pred):0.3f}$\n$aMeAPE = '
+                 f'{ameape(y_true, y_pred):0.3f}$\n$MeAE = '
+                 f'{median_absolute_error(y_true, y_pred):0.2f}$')
         ax.text(0.5, 0.98, label,
                 horizontalalignment='center',
                 verticalalignment='top',
@@ -131,7 +145,8 @@ def prediction_error(df, true='pop', pred='pop_pred', var=None, ax=None, images=
 
 
 def to_img(buildings, threshold=0.5):
-    """ Visdualize building footprint estimates as image with transparent background where buildings <= threshold. """
+    """ Visualize building footprint estimates as image with transparent
+        background where buildings <= threshold. """
     out = np.zeros((buildings.shape[0], buildings.shape[1], 4), np.uint8)
     for i in range(out.shape[0]):
         for j in range(out.shape[1]):
@@ -191,8 +206,10 @@ def to_pdf(survey, roi, tiles_path, out_path, points=None, coords=None,
                                 outlier = ', outlier = False'
                         img, buildings = get_tiles(x, y, roi, tiles_path)
                         f, axarr = plt.subplots(1, 3, figsize=(12, 5))
-                        display_pair(img, to_img(buildings), axarr, points=points[y, x])
-                        f.suptitle(f'Population = {n}, x = {x}, y = {y}{outlier}')
+                        display_pair(
+                            img, to_img(buildings), axarr, points=points[y, x])
+                        f.suptitle(
+                            f'Population = {n}, x = {x}, y = {y}{outlier}')
                         pdf.savefig()
                         plt.close()
                         writer.writerow([x, y, i])
@@ -210,7 +227,8 @@ def feature_importance(models, features, colors, crop=True, n_show=10):
     """ Plot feature importance for model as bar chart. """
     if not crop:
         n_show = 35
-    f, ax = plt.subplots(figsize=(n_show // 2.5, 5)) # TODO: allow custom ax to be passed
+    # TODO (isaac): allow custom ax to be passed.
+    f, ax = plt.subplots(figsize=(n_show // 2.5, 5))
 
     model_type = type(models[0]).__name__
     if model_type == 'RandomForestRegressor':
@@ -220,7 +238,8 @@ def feature_importance(models, features, colors, crop=True, n_show=10):
         importances = np.array([model.coef_ for model in models])
         y_label = 'Coefficient Magnitude'
     elif model_type == 'DummyRegressor':
-        importances = np.array([[0 for i in range(features.shape[0])] for model in models])
+        importances = np.array(
+            [[0 for i in range(features.shape[0])] for _ in models])
         y_label = 'N/A'
     else:
         print("Unsuported model")
@@ -244,7 +263,8 @@ def feature_importance(models, features, colors, crop=True, n_show=10):
     labels = features[idxs]
     colors_sorted = colors[idxs]
 
-    ax.bar(n, means, yerr=stds, color=colors_sorted, error_kw={'capsize': 2.5, 'capthick': 1.0})
+    ax.bar(n, means, yerr=stds, color=colors_sorted,
+           error_kw={'capsize': 2.5, 'capthick': 1.0})
     ax.set_xticks(n)
     ax.set_xticklabels(labels, rotation=45, ha='right')
 

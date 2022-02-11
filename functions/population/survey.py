@@ -1,4 +1,5 @@
-"""Module for rasterizing survey data. NOTE: this is dependent on survey details, so must be modified for each survey
+"""Module for rasterizing survey data.
+NOTE: this is dependent on survey details, so must be modified for each survey
 format. """
 
 import pandas as pd
@@ -46,7 +47,8 @@ def get_arr(df, extent, feature, verbose=False):
         arr[y, x] += row[feature]
     if verbose:
         print(f'Ignored {nan_count} values without position defined')
-    return np.where(arr > 0, arr, np.nan)  # set zero population grid elements to nan so they save to image properly
+    # Set zero population grid elements to nan so they save to image properly.
+    return np.where(arr > 0, arr, np.nan)
 
 
 def arr_to_raster(out_file, origin, pixel_width, pixel_height, srs, array):
@@ -60,7 +62,8 @@ def arr_to_raster(out_file, origin, pixel_width, pixel_height, srs, array):
 
     driver = gdal.GetDriverByName('GTiff')
     out_raster = driver.Create(out_file, cols, rows, 1, gdal.GDT_Byte)
-    out_raster.SetGeoTransform((origin[0], pixel_width, 0, origin[1], 0, -pixel_height))
+    out_raster.SetGeoTransform(
+        (origin[0], pixel_width, 0, origin[1], 0, -pixel_height))
     out_band = out_raster.GetRasterBand(1)
     out_band.WriteArray(array)
     out_band.SetNoDataValue(0)
@@ -101,5 +104,6 @@ def rasterize_survey(params):
     for (roi, survey_path, srs_path) in zip(rois, survey_paths, srs_paths):
         print(f'Rasterizing {roi} survey... ', end='')
         df = pd.read_stata(survey_path)
-        df_to_raster(df, os.path.join(out_path, f'{roi}_pop.tif'), srs_path, 'members_n')
+        df_to_raster(
+            df, os.path.join(out_path, f'{roi}_pop.tif'), srs_path, 'members_n')
         print('done.')

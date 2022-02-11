@@ -43,37 +43,46 @@ def get_stats(path, count):
 
 def predict_sample(img, mean, std, model):
     """
-    Standardize image with featurewise mean and standard deviation then make prediction with model.
+    Standardize image with featurewise mean and standard deviation then make
+    prediction with model.
 
     Args:
             img (:obj:`np.ndarray`): Input image to model.
             mean (:obj:`np.ndarray`): The feature-wise mean used to center img.
-            std (:obj:`np.ndarray`): The feature-wise standard deviation used to scale img.
+            std (:obj:`np.ndarray`): The feature-wise standard deviation used to
+                scale img.
             model (:obj:`tf.keras.Model`): Keras model used for predictions.
 
     Returns:
             :obj:`np.ndarray`: Model prediction.
     """
     original_size = img.shape[0:2]
-    img = tf.image.resize(img, model.input_shape[1:3])  # resize to match model input size
+    # Resize to match model input size.
+    img = tf.image.resize(img, model.input_shape[1:3])
     img = ((img / 255) - mean) / std
     img = np.expand_dims(img, axis=0)
     out = model.predict(img)[0]
-    out = tf.image.resize(out, original_size)  # resize back to original size
+    # Resize back to original size.
+    out = tf.image.resize(out, original_size)
     return out
 
 
-def estimate_footprints(roi, survey, img_dir, model_dirs, context_sizes, n_samples=1000):
+def estimate_footprints(roi, survey, img_dir, model_dirs, context_sizes,
+                        n_samples=1000):
     """
-    Estimate footprints using specified models for roi across survey tiles and surrounding context area, and save to disk.
+    Estimate footprints using specified models for roi across survey tiles and
+    surrounding context area, and save to disk.
 
     Args:
             roi (str): The roi to predict over, used for writing to disk.
             survey (:obj:`np.ndarray`): The survey whose tiles to predict on.
             img_dir (str): The path to the directory containing tiles.
-            model_dirs (:obj:`list` of :obj:`str`): The list of paths to models used for prediction.
-            context_sizes (:obj:`list` of :obj:`int`): The list of context sizes to predict on around survey tiles.
-            n_samples (:obj:`int`, optional): The number of samples to use to sample featurewise mean and standard deviation.
+            model_dirs (:obj:`list` of :obj:`str`): The list of paths to models
+                used for prediction.
+            context_sizes (:obj:`list` of :obj:`int`): The list of context sizes
+                to predict on around survey tiles.
+            n_samples (:obj:`int`, optional): The number of samples to use to
+                sample featurewise mean and standard deviation.
 
     Returns:
             None.
@@ -89,28 +98,38 @@ def estimate_footprints(roi, survey, img_dir, model_dirs, context_sizes, n_sampl
         if not os.path.exists(path):
             os.makedirs(path)
 
-    print(f'Predicting building footprints for survey tiles in {img_dir}', flush=True)
+    print(f'Predicting building footprints for survey tiles in {img_dir}',
+          flush=True)
     with tqdm(total=np.count_nonzero(survey)) as pbar:
         for y in tqdm(range(survey.shape[0])):
             for x in range(survey.shape[1]):
-                if survey[y, x] > 0:  # only predict for survey locations and surrounding contexts
-                    # predict over both x and y of context
-                    for x_inc in range((1 - context_size) // 2, (1 + context_size) // 2):
-                        for y_inc in range((1 - context_size) // 2, (1 + context_size) // 2):
+                # Only predict for survey locations and surrounding contexts
+                if survey[y, x] > 0:
+                    # Predict over both x and y of context.
+                    for x_inc in range((1 - context_size) // 2,
+                                       (1 + context_size) // 2):
+                        for y_inc in range((1 - context_size) // 2,
+                                           (1 + context_size) // 2):
                             tile_x, tile_y = x + x_inc, y + y_inc
-                            if (tile_y, tile_x) not in visited and in_bounds(survey, tile_y, tile_x):
+                            if (tile_y, tile_x) not in visited and in_bounds(
+                                    survey, tile_y, tile_x):
                                 img_path = f'{img_dir}{tile_y}_{tile_x}.tif'
                                 img = img_to_array(load_img(img_path))
                                 for i, model in enumerate(models):
                                     dst = f'{model_dirs[i]}pred/{roi}/{tile_y}_{tile_x}.tif'
-                                    out = np.array(predict_sample(img, mean, std, model)).astype(
-                                        'float32')  # TODO: speed up by performing in batches
+                                    # TODO (isaac): Speed up by performing in
+                                    # batches.
+                                    out = predict_sample(img, mean, std, model)
+                                    out = np.array(out).astype('float32')
                                     write_raster(out, img_path, dst)
-                                visited.add((tile_y, tile_x))  # avoid duplicating work due to overlapping contexts
+                                # Avoid duplicating work due to overlapping
+                                # contexts.
+                                visited.add((tile_y, tile_x))
                                 pbar.update(1)
 
 
-def estimate_footprints_full(roi, survey, img_dir, model_dirs, context_sizes, n_samples=1000):
+def estimate_footprints_full(roi, survey, img_dir, model_dirs, context_sizes,
+                             n_samples=1000):
     """
     Estimate footprints for entire roi using specified model, and save to disk.
 
@@ -119,8 +138,10 @@ def estimate_footprints_full(roi, survey, img_dir, model_dirs, context_sizes, n_
             survey (:obj:`np.ndarray`): The survey whose bounds to predict over.
             img_dir (str): The path to the directory containing tiles.
             model_dirs (str): Path to the model used for prediction.
-            context_sizes (:obj:`list` of :obj:`int`): The list of context sizes to predict on around survey tiles.
-            n_samples (:obj:`int`, optional): The number of samples to use to sample featurewise mean and standard deviation.
+            context_sizes (:obj:`list` of :obj:`int`): The list of context sizes
+                to predict on around survey tiles.
+            n_samples (:obj:`int`, optional): The number of samples to use to
+                sample featurewise mean and standard deviation.
 
     Returns:
             None.
@@ -138,14 +159,19 @@ def estimate_footprints_full(roi, survey, img_dir, model_dirs, context_sizes, n_
     print(survey.shape)
 
     for i, model in enumerate(models):
-        print(f'Predicting building footprints for all tiles in {img_dir}', flush=True)
-        for y in tqdm(range(survey.shape[0])):  # process data in vertical strips
-            imgs = [(((img_to_array(load_img(f'{img_dir}{y}_{x}.tif')) / 255) - mean) / std) for x in
-                    range(survey.shape[1])]
+        print(f'Predicting building footprints for all tiles in {img_dir}',
+              flush=True)
+        # Process data in vertical strips.
+        for y in tqdm(range(survey.shape[0])):
+            imgs = [img_to_array(load_img(f'{img_dir}{y}_{x}.tif')) / 255
+                    for x in range(survey.shape[1])]
+            imgs = [(img - mean) / std for img in imgs]
             shapes = [img.shape[0:2] for img in imgs]
-            imgs = np.array([tf.image.resize(img, model.input_shape[1:3]) for img in imgs])
+            imgs = np.array(
+                [tf.image.resize(img, model.input_shape[1:3]) for img in imgs])
             preds = model.predict(imgs)
-            preds = np.array([tf.image.resize(pred, shape) for pred, shape in zip(preds, shapes)])
+            preds = np.array([tf.image.resize(pred, shape)
+                              for pred, shape in zip(preds, shapes)])
             for x, pred in zip(range(survey.shape[1]), preds):
                 #                 img_path = f'{img_dir}{y}_{x}.tif'
                 dst = f'{model_dirs[i]}pred/{roi}/{y}_{x}.tif'
@@ -165,4 +191,5 @@ def run_footprints(params):
         if params['survey_only']:
             estimate_footprints(roi, pop, tile_dir, model_dirs, context_sizes)
         else:
-            estimate_footprints_full(roi, pop, tile_dir, model_dirs, context_sizes)
+            estimate_footprints_full(
+                roi, pop, tile_dir, model_dirs, context_sizes)

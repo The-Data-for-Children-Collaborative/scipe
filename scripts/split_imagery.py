@@ -28,14 +28,16 @@ def build_vrt(files_in, file_out, src_extent, target_extent):
 
     """
     out_tmp = file_out.replace('.vrt', '_src.vrt')
-    cmd = f'gdalbuildvrt -te {src_extent[0]} {src_extent[1]} {src_extent[2]} {src_extent[3]} {out_tmp}'
+    cmd = (f'gdalbuildvrt -te {src_extent[0]} {src_extent[1]} {src_extent[2]} '
+           f'{src_extent[3]} {out_tmp}')
     for f in files_in:
         cmd += " " + f
     print("Building virtual dataset")
     subprocess.call(cmd)
     height, width = get_shape(out_tmp)
     x_min, y_min, x_max, y_max = target_extent
-    cmd = f'gdalwarp -overwrite -s_srs EPSG:4326 -t_srs EPSG:32736 -ts {width} {height} -te {x_min} {y_min} {x_max} {y_max} {out_tmp} {file_out}'
+    cmd = (f'gdalwarp -overwrite -s_srs EPSG:4326 -t_srs EPSG:32736 -ts {width}'
+           f' {height} -te {x_min} {y_min} {x_max} {y_max} {out_tmp} {file_out}')
     subprocess.call(cmd)
 
 
@@ -54,12 +56,16 @@ def crop_img(img, out_dir, grid_shape, x_offset, y_offset, img_ext):
     Returns:
         None
     """
-    base_cmd = 'gdal_translate -q -of GTIFF -ot BYTE -co COMPRESS=JPEG -co JPEG_QUALITY=90 -projwin'
+    base_cmd = ('gdal_translate -q -of GTIFF -ot BYTE -co COMPRESS=JPEG -co '
+                'JPEG_QUALITY=90 -projwin')
     print("Slicing dataset")
     with tqdm(total=grid_shape[1] * grid_shape[0]) as pbar:
         for y in range(grid_shape[0]):
             for x in range(grid_shape[1]):
-                src_win = f'{img_ext[0] + x * x_offset} {img_ext[3] - y * y_offset} {img_ext[0] + (x + 1) * x_offset} {img_ext[3] - (y + 1) * y_offset}'
+                src_win = (f'{img_ext[0] + x * x_offset} '
+                           f'{img_ext[3] - y * y_offset} '
+                           f'{img_ext[0] + (x + 1) * x_offset} '
+                           f'{img_ext[3] - (y + 1) * y_offset}')
                 out_name = f'{out_dir}{y}_{x}.tif'
                 cmd = f'{base_cmd} {src_win} {img} {out_name}'
                 os.system(cmd)
@@ -73,7 +79,8 @@ def get_srs(img):
 
 
 def get_extent(img, epsg=None):
-    """ Return extent of geoTiff img, in SRS associated with epsg if specified. """
+    """ Return extent of geoTiff img, in SRS associated with epsg if
+        specified. """
     if epsg:
         new_img = './tmp/proj.tif'
         gdal.Warp(new_img, img, dstSRS=f'EPSG:{epsg}')
@@ -104,20 +111,24 @@ def overlapping(img_ext, ref_ext):
     """ Returns true if extent img_ext overlaps with extent ref_ext. """
     x_bounds = (ref_ext[0], ref_ext[2])
     y_bounds = (ref_ext[1], ref_ext[3])
-    x_in_range = in_range(img_ext[0], x_bounds) or in_range(img_ext[2], x_bounds)
-    y_in_range = in_range(img_ext[1], y_bounds) or in_range(img_ext[3], y_bounds)
+    x_in_range = (in_range(img_ext[0], x_bounds)
+        or in_range(img_ext[2], x_bounds))
+    y_in_range = (in_range(img_ext[1], y_bounds)
+        or in_range(img_ext[3], y_bounds))
     return x_in_range and y_in_range
 
 
 #
 def get_overlap_imgs(src_dir, ref_ext):
-    """ Returns list of geoTiffs in src_dir that are within the extent of ref_img. """
+    """ Returns list of geoTiffs in src_dir that are within the extent of
+        ref_img. """
     imgs = []
     for file in os.listdir(src_dir):
         if file.endswith(".tif"):
             file_path = os.path.join(src_dir, file)
             img_ext = get_extent(file_path)
-            if overlapping(img_ext, ref_ext):  # image overlaps with reference area
+            # Image overlaps with reference area.
+            if overlapping(img_ext, ref_ext):
                 imgs.append(file_path)
     return imgs
 
@@ -141,20 +152,25 @@ def remove_all(directory, ext):
 
 #
 def split_dataset(src_dir, ref_img, out_dir, tmp_dir='./tmp/'):
-    """ Split geoTiffs in src_dir into image patches covering each pixel of ref_img. """
+    """ Split geoTiffs in src_dir into image patches covering each pixel of
+        ref_img. """
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
     if not os.path.exists(tmp_dir):
-        os.mkdir(tmp_dir)  # for gdal temporary files
+        # For gdal temporary files.
+        os.mkdir(tmp_dir)
 
-    src_examples = [f for f in os.listdir(src_dir) if f.endswith('.tif')]  # get valid files from src_dir
+    # Get valid files from src_dir.
+    src_examples = [f for f in os.listdir(src_dir) if f.endswith('.tif')]
     if len(src_examples) > 0:
         src_example = os.path.join(src_dir,src_examples[0])
     else:
         print("No geoTiffs found in src_dir.")
         return
-    src_epsg = get_srs(src_example).GetAttrValue('AUTHORITY', 1)  # get source epsg
-    ref_ext_reproj = get_extent(ref_img, epsg=src_epsg)  # get extent of ref img in source spatial reference
+    # Get source epsg.
+    src_epsg = get_srs(src_example).GetAttrValue('AUTHORITY', 1)
+    # Get extent of ref img in source spatial reference.
+    ref_ext_reproj = get_extent(ref_img, epsg=src_epsg)
     img_paths = get_overlap_imgs(src_dir, ref_ext_reproj)
     vrt_path = os.path.join(out_dir, 'mosaic.vrt')
     build_vrt(img_paths, vrt_path, ref_ext_reproj, get_extent(ref_img))
@@ -166,7 +182,8 @@ def split_dataset(src_dir, ref_img, out_dir, tmp_dir='./tmp/'):
 
     crop_img(vrt_path, out_dir, ref_shape, x_offset, y_offset, img_ext)
     remove_all(out_dir, '.msk')
-    shutil.rmtree(tmp_dir)  # remove temporary files
+    # Remove temporary files.
+    shutil.rmtree(tmp_dir)
 
 
 if __name__ == '__main__':

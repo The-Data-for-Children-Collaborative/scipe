@@ -2,12 +2,11 @@ import numpy as np
 import random
 import keras
 import json
-from keras.preprocessing.image import ImageDataGenerator
 
 
 class SatelliteImageDataGenerator(keras.utils.Sequence):
-    """ Data generator used to randomly sample large satellite image. Stores band-wise mean and std for image
-    centering. """
+    """ Data generator used to randomly sample large satellite image.
+        Stores band-wise mean and std for image centering. """
 
     def __init__(self, img, labels, img_size, batch_size, n_samples):
         self.img = img
@@ -32,22 +31,23 @@ class SatelliteImageDataGenerator(keras.utils.Sequence):
         for i in range(self.batch_size):
             i_w = np.random.randint(self.width - self.img_size)
             i_h = np.random.randint(self.height - self.img_size)
-            while ((i_w,
-                    i_h) in self.indices):  # repeat until fresh indices are generated
+            # Repeat until fresh indices are generated.
+            while ((i_w, i_h) in self.indices):
                 i_w = np.random.randint(self.width - self.img_size)
                 i_h = np.random.randint(self.height - self.img_size)
             self.indices.add((i_w, i_h))
+            # Take img_size x img_size crop of full image.
             sample = self.img[i_h:(i_h + self.img_size),
-                     i_w:(i_w + self.img_size)]  # take img_size x img_size crop of full image with
+                     i_w:(i_w + self.img_size)]
             label = self.labels[i_h:(i_h + self.img_size), i_w:(i_w + self.img_size)]
 
-            # feature-wise normalization/centering
+            # Feature-wise normalization/centering.
             sample = self.flow(sample)
             X_batch.append(sample)
             y_batch.append(label)
         return np.array(X_batch), np.array(y_batch)
 
-    def fit(self, img_fit):  # fit datagen to featurewise statistics of img_fit
+    def fit(self, img_fit):
         mean = []
         std = []
         for i in range(self.img.shape[2]):
@@ -63,16 +63,16 @@ class SatelliteImageDataGenerator(keras.utils.Sequence):
         return sample
 
     def to_json(self, path):
-        d = {'mean': list(self.mean.astype(float)), 'std': list(self.std.astype(float))}
+        d = {'mean': list(self.mean.astype(float)),
+             'std': list(self.std.astype(float))}
         with open(path, 'w') as file:
             json.dump(d, file)
         print('serialized generator constants to JSON')
 
 
-#
 class MultiSatelliteImageDataGenerator(keras.utils.Sequence):
-    """ Multi-image version of SatelliteImageDataGenerator. Randomly chooses between both samplers each item of
-    batch. """
+    """ Multi-image version of SatelliteImageDataGenerator. Randomly chooses
+        between both samplers each item of batch. """
 
     def __init__(self, generators, batch_size, n_samples, weights=None):
         self.generators = generators
@@ -86,9 +86,11 @@ class MultiSatelliteImageDataGenerator(keras.utils.Sequence):
     def __getitem__(self, index):
         X_batch = []
         y_batch = []
-        for i in range(self.batch_size):
-            gen = random.choices(self.generators, weights=self.weights)[0]  # choose a random generator
-            item = gen.__getitem__(index)  # for now assumes batch size of generators is 1
+        for _ in range(self.batch_size):
+            # Choose a random generator.
+            gen = random.choices(self.generators, weights=self.weights)[0]
+            # For now assumes batch size of generators is 1.
+            item = gen.__getitem__(index)
             X_batch.append(item[0][0])
             y_batch.append(item[1][0])
         return np.array(X_batch), np.array(y_batch)

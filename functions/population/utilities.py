@@ -30,16 +30,19 @@ def write_raster(arr, match_filename, dst_filename, dtype=gdal.GDT_Float32):
     ds_out.FlushCache()  # save to disk
 
 
-def project_raster(src_filename, match_filename, dst_filename, resampling, n_bands=0):
+def project_raster(src_filename, match_filename, dst_filename, resampling,
+                   n_bands=0):
     """
-    Reproject source raster to match georeferencing of match raster, using specified resampling technique. Outputs to disk.
+    Reproject source raster to match georeferencing of match raster, using
+    specified resampling technique. Outputs to disk.
 
     Args:
         src_filename (str): Path to raster to reproject.
         match_filename (str): geoTiff to reproject to.
         dst_filename (str): Path to write reprojected raster to.
         resampling (int): GDAL resmapling code.
-        n_bands (:obj:`int`, optional): Number of bands to reproject. Defaults to 0 (all bands).
+        n_bands (:obj:`int`, optional): Number of bands to reproject.
+            Defaults to 0 (all bands).
 
     Returns:
         None
@@ -60,8 +63,9 @@ def project_raster(src_filename, match_filename, dst_filename, resampling, n_ban
         n_bands = 10
 
     # output/destination
-    dst = gdal.GetDriverByName('Gtiff').Create(dst_filename, match_ds.RasterXSize, match_ds.RasterYSize, n_bands,
-                                               gdalconst.GDT_Float32)
+    dst = gdal.GetDriverByName('Gtiff').Create(
+        dst_filename, match_ds.RasterXSize, match_ds.RasterYSize, n_bands,
+        gdalconst.GDT_Float32)
     dst.GetRasterBand(1).SetNoDataValue(0)
     dst.SetGeoTransform(match_geotrans)
     dst.SetProjection(match_proj)
@@ -73,7 +77,8 @@ def project_raster(src_filename, match_filename, dst_filename, resampling, n_ban
 
 def proximity_raster(src_filename, dst_filename):
     """
-    Calculate Euclidean distance to closest True cell for boolean src raster. Outputs to disk.
+    Calculate Euclidean distance to closest True cell for boolean src raster.
+    Outputs to disk.
 
     Args:
         src_filename (str): Path to raster to run distance calculation on.
@@ -89,12 +94,14 @@ def proximity_raster(src_filename, dst_filename):
     src_geotrans = src_ds.GetGeoTransform()
 
     # output/destination
-    dst = gdal.GetDriverByName('Gtiff').Create(dst_filename, src_ds.RasterXSize, src_ds.RasterYSize, 1,
-                                               gdalconst.GDT_Float32)
+    dst = gdal.GetDriverByName('Gtiff').Create(
+        dst_filename, src_ds.RasterXSize, src_ds.RasterYSize, 1,
+        gdalconst.GDT_Float32)
     dst.GetRasterBand(1).SetNoDataValue(-1)
     dst.SetGeoTransform(src_geotrans)
     dst.SetProjection(src_proj)
 
-    gdal.ComputeProximity(src_ds.GetRasterBand(1), dst.GetRasterBand(1), ["DISTUNITS=GEO"])
-
-    del dst  # flush to save to disk TODO: shouldn't be required
+    gdal.ComputeProximity(src_ds.GetRasterBand(1), dst.GetRasterBand(1),
+                          ["DISTUNITS=GEO"])
+     # Flush to save to disk TODO (isaac): shouldn't be required due to gc?
+    del dst
