@@ -1,4 +1,6 @@
-# Population Estimation Project
+# SCIPE
+
+Code for the paper Sustainable Census Independent Population Estimation in Mozambique (SCIPE).
 
 ## Scripts
 There are several scripts included with the project. They are intended to be run in the following order:
@@ -15,9 +17,3 @@ Executing `run_pipeline.py` yields the following results for the example [`pipel
 
 <img src="/experiments/swav/swav/outliers_removed/prediction_error.png" alt="Predicted vs. observed values"  height="400">
 <img src="/experiments/swav/swav/outliers_removed/rf_importance.png" alt="Predicted vs. observed values"  height="400">
-
-## Data
-Data required to run the pipeline can be downloaded from [TBC].
-
-## TODO:
-Add foresci as pip dependency for conda env
