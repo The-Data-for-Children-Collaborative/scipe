@@ -16,4 +16,4 @@ Each script takes a separate YAML config file as input, examples of each can be 
 Executing `run_pipeline.py` yields the following results for the example [`pipeline.yaml`](/scripts/config/pipeline.yaml) with outliers removed:
 
 <img src="/experiments/barlow/outliers_removed/prediction_error.pdf" alt="Predicted vs. observed values"  height="400">
-<img src="/experiments/barlow/outliers_removed/rf_importance.pdf" alt="Predicted vs. observed values"  height="400">
+<img src="/experiments/barlow/outliers_removed/rf_importance.pdf" alt="Feature importance"  height="400">
