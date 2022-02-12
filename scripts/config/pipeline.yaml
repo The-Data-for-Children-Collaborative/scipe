@@ -1,6 +1,5 @@
 ---
 # NOTE: Pipeline should be run from root of project, so define paths relative to there
-directory:
 # Preprocessing parameters
 preprocessing:
     run: False # set to True to rerun preprocessing according to specification below
@@ -15,20 +14,20 @@ preprocessing:
         - average
         - nearest
         - max
-    landsat_indices: [ndvi,ndwi] # incides to compute using landsat data
-    landcover: landcover.tif # name of copernicus landcover map, must appear in input_rasters
-    landsat: landsat.tif # name of landsat raster, must appear in input_rasters
-    roads: roads.tif # name of roads raster, must appear in input_rasters
+    indices: [ndvi,ndwi] # incides to compute using landsat data
     rois: [boa,mgd] # rois to run preprocessing over
     pop_rasters: # population count raster for each roi in geoTiff format
         - ./data/pop/boa_pop.tif
         - ./data/pop/mgd_pop.tif
-    output_dir: ./data/processed/ # will contain processed data, one folder per ROI
+    output_dir: ./data/processed/
+    landcover: landcover.tif # name of copernicus landcover map
+    landsat: landsat.tif # namne of landsat raster
+    roads: roads.tif # name of roads raster
     footprint_dirs: # directories storing building footprint rasters, containing a sub-folders for each roi (must be saved as probability maps)
         - ./spacenet/models/model_1_old/pred/
         - ./spacesur/dataset_2/models/model_1/pred/
         - ./spacesur/dataset_2/models/model_2/pred/
-    model_names: [sn,ss2_1,ss2_2] # names of models associated with each footprint dir (spacenet, spacesur dataset 2 model 1 etc.)
+    model_names: [sn,ss2_1,ss2_2] # names of models associated with each footprint dir
     thresholds: [0.5,0.2,0.5] # thresholds to apply to each set of footprints
 
 # Dataset construction parameters
@@ -42,63 +41,53 @@ dataset:
         - ./outliers/boa_outliers_new.csv
         - ./outliers/mgd_outliers_new.csv
     context_sizes: [3,5] # size of feature contexts to consider when building dataset
-#     zero_label_paths: # optional: paths to zero labels in addition to the survey TODO: make this better
-#         - ./data/pop/boa_zero.pkl
-#         - ./data/pop/mgd_zero.pkl
-    save_dataset: True # whether to save dataset to disk
-    dataset_path: ./experiments/test2/dataset.csv
+    zero_label_paths: # optional: paths to zero labels in addition to the survey
+        - ./data/pop/boa_zero.pkl
+        - ./data/pop/mgd_zero.pkl
 
 # Embedding parameters
 embedding:
     run: True # whether to embed survey tiles
-    models: # choose from [swav,resnet,inception,vgg16,densenet,deepcluster,barlow]
-        - swav
+    models: [] # choose from [swav,swav_pretrained,tile2vec,resentv2,inceptionv3,vgg16,xception,densenet,barlow]
+#         - tile2vec
+#         - swav
+#         - swav_pretrained
 #         - inception
 #         - resnet
 #         - densenet
 #         - vgg16
 #         - deepcluster
 #         - barlow
-    rois: [boa,mgd]
-    tiles_path: ./survey_tiles/ # TODO: detail structure of directory
-    finetuning:
-        run: True # whether to fine tune models
-        batch_size: 32 # batch size for training
-        frozen_epochs: 5 # numer of epochs to train head of model for with encoder frozen
-        epochs: 15 # numer of epochs to train full model for with discriminative learning rate
-        save_models: True # whether to save finetuned models to disk
-        models_dir: ./experiments/test2/models/  # directory to save fintetuned models to
-    append_precomputed: False
     precomputed: # precomputed tile embeddings to add to dataset
-        - ./csv/embeddings/swav_nosplit_15_5.csv
-        - ./csv/embeddings/deepcluster_nosplit_15_5.csv
-        - ./csv/embeddings/resnet_nosplit_15_5.csv
         - ./csv/embeddings/barlow_nosplit_15_5.csv
+    rois: [boa,mgd]
+    tiles_path: ./survey_tiles/
 
 # Population prediction parameters
 prediction:
     run: True
-    feature_sets: # sets of features to run experiments with (csv file holding dataframe column names,
-                  # or <str>_#, which corresponds to column names where # is replaced with a number)
+    feature_sets: # sets of features to run experiments with (csv file holding dataframe column names)
 #         - ./scripts/config/features/public.csv
 #         - ./scripts/config/features/spacesur_only.csv
 #         - ./scripts/config/features/public_spacesur.csv
-         - ./scripts/config/features/swav.csv
+#         - ./scripts/config/features/swav.csv
 #         - ./scripts/config/features/deepcluster.csv
 #         - ./scripts/config/features/resnet.csv
 #         - ./scripts/config/features/barlow.csv
+#         - ./scripts/config/features/swav_pretrained.csv
+#         - ./scripts/config/features/tile2vec.csv
 #         - ./scripts/config/features/inception.csv
 #         - ./scripts/config/features/resnet.csv
 #         - ./scripts/config/features/densenet.csv
 #         - ./scripts/config/features/vgg16.csv
-    experiment_dir: ./experiments/test/ # where to output experiment results
-    models: # models to run experiments with, choose from [lasso, rf, poisson, dummy]
-         - lasso
-#        - rf
+    experiment_dir: ./experiments/barlow/ # where to output experiment results
+    models: # models to run experiments with, choose from [lasso, rf, poisson, huber, dummy]
+#         - lasso
+        - rf
     log: # whether to predict log of population for each model
 #         - False
-        - True
-    show_roi: False # whether to give access to roi as a feature
+        - False
+    show_roi: False # give access to roi as feature?
 
 # Population estimation (i.e. over entire roi) parameters
 estimation:
@@ -109,8 +98,9 @@ estimation:
     model: lasso
     log: False
     include_outliers: False # whether to include survey outliers when training
-    embed: True # run embeddings as per 'embedding' params
-    feature_set: ./scripts/config/features/swav.csv
+    embed: True
+#     feature_set: ./scripts/config/features/spacesur_only.csv
+    feature_set: ./scripts/config/features/swav_pretrained.csv
     prediction_dir: ./predictions/swav_lasso_no_outlier/
 #     hurdle_feature: building_area_ss2_2 # if specified feature is zero, set population to zero
 ...
