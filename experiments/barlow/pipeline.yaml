@@ -1,0 +1,106 @@
+---
+# NOTE: Pipeline should be run from root of project, so define paths relative to there
+# Preprocessing parameters
+preprocessing:
+    run: False # set to True to rerun preprocessing according to specification below
+    input_dir: ./data/raw/
+    input_rasters: # files to process from input_dir in geoTiff format
+        - landsat.tif
+        - ntl.tif
+        - landcover.tif
+        - hrsl.tif
+    resampling: # resampling method for each input raster
+        - average
+        - average
+        - nearest
+        - max
+    indices: [ndvi,ndwi] # incides to compute using landsat data
+    rois: [boa,mgd] # rois to run preprocessing over
+    pop_rasters: # population count raster for each roi in geoTiff format
+        - ./data/pop/boa_pop.tif
+        - ./data/pop/mgd_pop.tif
+    output_dir: ./data/processed/
+    landcover: landcover.tif # name of copernicus landcover map
+    landsat: landsat.tif # namne of landsat raster
+    roads: roads.tif # name of roads raster
+    footprint_dirs: # directories storing building footprint rasters, containing a sub-folders for each roi (must be saved as probability maps)
+        - ./spacenet/models/model_1_old/pred/
+        - ./spacesur/dataset_2/models/model_1/pred/
+        - ./spacesur/dataset_2/models/model_2/pred/
+    model_names: [sn,ss2_1,ss2_2] # names of models associated with each footprint dir
+    thresholds: [0.5,0.2,0.5] # thresholds to apply to each set of footprints
+
+# Dataset construction parameters
+dataset:
+    input_dir: ./data/processed/ # path to processed data
+    rois: [boa,mgd] # rois to include in dataset
+    pop_rasters: # population count raster for each roi
+        - ./data/pop/boa_pop.tif
+        - ./data/pop/mgd_pop.tif
+    outliers_paths: # paths to csv files defining outlier samples for each roi
+        - ./outliers/boa_outliers_new.csv
+        - ./outliers/mgd_outliers_new.csv
+    context_sizes: [3,5] # size of feature contexts to consider when building dataset
+    zero_label_paths: # optional: paths to zero labels in addition to the survey
+        - ./data/pop/boa_zero.pkl
+        - ./data/pop/mgd_zero.pkl
+
+# Embedding parameters
+embedding:
+    run: True # whether to embed survey tiles
+    models: [] # choose from [swav,swav_pretrained,tile2vec,resentv2,inceptionv3,vgg16,xception,densenet,barlow]
+#         - tile2vec
+#         - swav
+#         - swav_pretrained
+#         - inception
+#         - resnet
+#         - densenet
+#         - vgg16
+#         - deepcluster
+#         - barlow
+    precomputed: # precomputed tile embeddings to add to dataset
+        - ./csv/embeddings/barlow_nosplit_15_5.csv
+    rois: [boa,mgd]
+    tiles_path: ./survey_tiles/
+
+# Population prediction parameters
+prediction:
+    run: True
+    feature_sets: # sets of features to run experiments with (csv file holding dataframe column names)
+#         - ./scripts/config/features/public.csv
+#         - ./scripts/config/features/spacesur_only.csv
+#         - ./scripts/config/features/public_spacesur.csv
+#         - ./scripts/config/features/swav.csv
+#         - ./scripts/config/features/deepcluster.csv
+#         - ./scripts/config/features/resnet.csv
+#         - ./scripts/config/features/barlow.csv
+#         - ./scripts/config/features/swav_pretrained.csv
+#         - ./scripts/config/features/tile2vec.csv
+#         - ./scripts/config/features/inception.csv
+#         - ./scripts/config/features/resnet.csv
+#         - ./scripts/config/features/densenet.csv
+#         - ./scripts/config/features/vgg16.csv
+    experiment_dir: ./experiments/barlow/ # where to output experiment results
+    models: # models to run experiments with, choose from [lasso, rf, poisson, huber, dummy]
+#         - lasso
+        - rf
+    log: # whether to predict log of population for each model
+#         - False
+        - False
+    show_roi: False # give access to roi as feature?
+
+# Population estimation (i.e. over entire roi) parameters
+estimation:
+    run: False # whether or not to run estimation
+    rois: [boa] # rois to estimate over
+    pop_rasters: # population count raster for each roi, used to match grid for estimates
+        - ./data/pop/boa_pop.tif
+    model: lasso
+    log: False
+    include_outliers: False # whether to include survey outliers when training
+    embed: True
+#     feature_set: ./scripts/config/features/spacesur_only.csv
+    feature_set: ./scripts/config/features/swav_pretrained.csv
+    prediction_dir: ./predictions/swav_lasso_no_outlier/
+#     hurdle_feature: building_area_ss2_2 # if specified feature is zero, set population to zero
+...
