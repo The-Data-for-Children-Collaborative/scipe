@@ -17,6 +17,9 @@ Each script takes a separate YAML config file as input, examples of each can be 
 ## Models
 Pretrained population models are available from the authors upon request.
 
+## Documentation
+Documentation is available at [`/docs/_build/html/index.html`](./docs/_build/html/index.html)
+
 ## Examples
 Executing `run_pipeline.py` yields the following results for the example [`pipeline.yaml`](/scripts/config/pipeline.yaml) with outliers removed:
 
