@@ -23,5 +23,5 @@ Documentation is available at [`/docs/_build/html/index.html`](./docs/_build/htm
 ## Examples
 Executing `run_pipeline.py` yields the following results for the example [`pipeline.yaml`](/scripts/config/pipeline.yaml) with outliers removed:
 
-<img src="/experiments/barlow/outliers_removed/prediction_error.pdf" alt="Predicted vs. observed values"  height="400">
-<img src="/experiments/barlow/outliers_removed/rf_importance.pdf" alt="Feature importance"  height="400">
+<img src="/experiments/barlow/outliers_removed/prediction_error.png" alt="Predicted vs. observed values"  height="400">
+<img src="/experiments/barlow/outliers_removed/rf_importance.png" alt="Feature importance"  height="400">
