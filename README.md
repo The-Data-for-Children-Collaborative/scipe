@@ -2,7 +2,7 @@
 
 Research code for _Sustainable Census Independent Population Estimation (SCIPE)_ - a pipeline for predicting population maps using microcensus data and satellite imagery.
 
-SCIPE is introduced in the paper 'Census-Independent Population Estimation using Representation Learning' (2021) [[preprint]](https://arxiv.org/abs/2110.02839).
+SCIPE is introduced in the paper ['Census-Independent Population Estimation using Representation Learning' [Scientific Reports (2022)]](https://www.nature.com/articles/s41598-022-08935-1).
 
 ## Scripts
 There are several scripts included with the project. They are intended to be run in the following order:
